@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
 import StatusBadge from '@/components/StatusBadge';
 import ConfirmModal from '@/components/ConfirmModal';
+import QuickDaysBookingModal from '@/components/QuickDaysBookingModal';
 import Toast from '@/components/Toast';
 import {
   Plus,
@@ -22,7 +23,8 @@ import {
   Star,
   Eye,
   SlidersHorizontal,
-  RefreshCw
+  RefreshCw,
+  Calendar
 } from 'lucide-react';
 
 const getCachedFlats = () => {
@@ -48,6 +50,7 @@ function FlatsContent() {
   const [filterStatus, setFilterStatus] = useState('All');
   const [deleteCandidate, setDeleteCandidate] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
+  const [bookingModalFlat, setBookingModalFlat] = useState(null);
 
   const fetchFlats = async (silent = false) => {
     try {
@@ -513,14 +516,19 @@ function FlatsContent() {
                       </Link>
 
                       {!isBooked && (
-                        <Link
-                          href={`/check-in?flat_id=${flat.id}`}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setBookingModalFlat(flat);
+                          }}
                           className="btn btn-mint btn-sm"
                           style={{ padding: '6px 12px', fontSize: '12px' }}
                         >
-                          <UserPlus size={13} />
-                          <span>Check-in</span>
-                        </Link>
+                          <Calendar size={13} />
+                          <span>Book Days</span>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -530,6 +538,11 @@ function FlatsContent() {
           })}
         </div>
       )}
+      <QuickDaysBookingModal
+        isOpen={!!bookingModalFlat}
+        flat={bookingModalFlat}
+        onClose={() => setBookingModalFlat(null)}
+      />
     </div>
   );
 }

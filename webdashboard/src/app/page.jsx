@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import StatusBadge from '@/components/StatusBadge';
 import ReceiptModal from '@/components/ReceiptModal';
+import QuickDaysBookingModal from '@/components/QuickDaysBookingModal';
 import Toast from '@/components/Toast';
 import {
   Wallet,
@@ -26,7 +27,8 @@ import {
   Star,
   RefreshCw,
   Eye,
-  Send
+  Send,
+  Calendar
 } from 'lucide-react';
 
 const getCachedDashboard = () => {
@@ -48,6 +50,7 @@ export default function HomePage() {
   const [toastMessage, setToastMessage] = useState('');
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  const [bookingModalFlat, setBookingModalFlat] = useState(null);
 
   // Quick Expense state
   const [expenseTitle, setExpenseTitle] = useState('');
@@ -554,10 +557,14 @@ export default function HomePage() {
                         {/* Price & Actions Row */}
                         <div className="property-action-bar">
                           <div>
-                            <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block' }}>Rent Price</span>
-                            <span className="property-rent-val">
-                              PKR {Number(flat.monthly_rent).toLocaleString()}
-                              <span style={{ fontSize: '11px', fontWeight: '400', color: '#94A3B8' }}>/mo</span>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                              <span className="property-rent-val">
+                                PKR {Number(flat.daily_rate || Math.round(Number(flat.monthly_rent || 0) / 30)).toLocaleString()}
+                              </span>
+                              <span style={{ fontSize: '11px', fontWeight: '500', color: '#64748B' }}>/day</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', fontWeight: '500' }}>
+                              PKR {Number(flat.monthly_rent).toLocaleString()} /mo
                             </span>
                           </div>
 
@@ -572,14 +579,18 @@ export default function HomePage() {
                                 <ArrowRight size={12} />
                               </Link>
                             ) : (
-                              <Link
-                                href={`/check-in?flat_id=${flat.id}`}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setBookingModalFlat(flat);
+                                }}
                                 className="btn btn-mint btn-sm"
                                 style={{ padding: '6px 10px', fontSize: '11.5px' }}
                               >
-                                <UserPlus size={12} />
-                                <span>Check-in</span>
-                              </Link>
+                                <Calendar size={12} />
+                                <span>Book Days</span>
+                              </button>
                             )}
                           </div>
                         </div>
@@ -891,6 +902,12 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      <QuickDaysBookingModal
+        isOpen={!!bookingModalFlat}
+        flat={bookingModalFlat}
+        onClose={() => setBookingModalFlat(null)}
+      />
     </div>
   );
 }

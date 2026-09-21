@@ -17,6 +17,7 @@ export default function EditFlatClient({ params }) {
     bedrooms: '2',
     size: '',
     monthly_rent: '',
+    daily_rate: '',
     status: 'Vacant',
   });
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,7 @@ export default function EditFlatClient({ params }) {
             bedrooms: res.data.bedrooms || '2',
             size: res.data.size || '',
             monthly_rent: res.data.monthly_rent || '',
+            daily_rate: res.data.daily_rate || (res.data.monthly_rent ? Math.round(Number(res.data.monthly_rent) / 30) : ''),
             status: res.data.status || 'Vacant',
           });
         }
@@ -183,10 +185,32 @@ export default function EditFlatClient({ params }) {
                 type="number"
                 className="form-input"
                 value={formData.monthly_rent}
-                onChange={(e) => setFormData({ ...formData, monthly_rent: e.target.value })}
+                onChange={(e) => {
+                  const rent = e.target.value;
+                  const calculatedDaily = rent ? Math.round(Number(rent) / 30) : '';
+                  setFormData(prev => ({
+                    ...prev,
+                    monthly_rent: rent,
+                    daily_rate: (!prev.daily_rate || prev.daily_rate === Math.round(Number(prev.monthly_rent || 0) / 30).toString()) ? calculatedDaily.toString() : prev.daily_rate
+                  }));
+                }}
                 required
               />
             </div>
+          </div>
+
+          <div className="form-group" style={{ marginTop: '14px' }}>
+            <label className="form-label">Daily Rate / Per-Day Charge (PKR) *</label>
+            <input
+              type="number"
+              className="form-input"
+              value={formData.daily_rate}
+              onChange={(e) => setFormData({ ...formData, daily_rate: e.target.value })}
+              required
+            />
+            <span style={{ fontSize: '11px', color: '#94A3B8', marginTop: '3px', display: 'block' }}>
+              Auto-calculated as Monthly ÷ 30, customizable for short-term stay bookings
+            </span>
           </div>
 
           <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>

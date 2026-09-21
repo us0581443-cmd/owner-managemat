@@ -24,6 +24,8 @@ export default function AddFlatPage() {
     bedrooms: '2',
     size: '1,200 sqft',
     monthly_rent: '',
+    daily_rate: '',
+    furnishing_status: 'Unfurnished',
     status: 'Vacant',
   });
   const [selectedPhoto, setSelectedPhoto] = useState(PHOTO_PRESETS[0]);
@@ -169,15 +171,53 @@ export default function AddFlatPage() {
               </div>
 
               <div className="form-group">
+                <label className="form-label">Furnishing Status</label>
+                <select
+                  className="form-select"
+                  value={formData.furnishing_status || 'Unfurnished'}
+                  onChange={(e) => setFormData({ ...formData, furnishing_status: e.target.value })}
+                >
+                  <option value="Unfurnished">Unfurnished</option>
+                  <option value="Semi-Furnished">Semi-Furnished</option>
+                  <option value="Fully Furnished">Fully Furnished</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-grid-2">
+              <div className="form-group">
                 <label className="form-label">Monthly Rent (PKR) *</label>
                 <input
                   type="number"
                   className="form-input"
-                  placeholder="e.g. 85000"
+                  placeholder="e.g. 75000"
                   value={formData.monthly_rent}
-                  onChange={(e) => setFormData({ ...formData, monthly_rent: e.target.value })}
+                  onChange={(e) => {
+                    const rent = e.target.value;
+                    const calculatedDaily = rent ? Math.round(Number(rent) / 30) : '';
+                    setFormData(prev => ({
+                      ...prev,
+                      monthly_rent: rent,
+                      daily_rate: (!prev.daily_rate || prev.daily_rate === Math.round(Number(prev.monthly_rent || 0) / 30).toString()) ? calculatedDaily.toString() : prev.daily_rate
+                    }));
+                  }}
                   required
                 />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Daily Rate / Per-Day Charge (PKR) *</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  placeholder="e.g. 2500"
+                  value={formData.daily_rate}
+                  onChange={(e) => setFormData({ ...formData, daily_rate: e.target.value })}
+                  required
+                />
+                <span style={{ fontSize: '11px', color: '#94A3B8', marginTop: '2px', display: 'block' }}>
+                  Auto-calculated as Monthly ÷ 30, customizable for short stays
+                </span>
               </div>
             </div>
 

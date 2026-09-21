@@ -505,13 +505,12 @@ export default function PaymentsPage() {
 
                                 <button
                                   type="button"
-                                  className="btn btn-navy btn-sm"
+                                  className="corner-pdf-btn"
                                   onClick={() => handleDirectDownloadPdf(p)}
-                                  style={{ padding: '5px 10px', fontSize: '12px' }}
                                   title="Download Official PDF Receipt"
+                                  style={{ width: '28px', height: '28px' }}
                                 >
                                   <Download size={13} />
-                                  <span>PDF</span>
                                 </button>
 
                                 <button
