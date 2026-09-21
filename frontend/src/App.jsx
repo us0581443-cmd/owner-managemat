@@ -273,8 +273,8 @@ export default function App() {
   };
 
   // Tenant Check-in Initiation
-  const handleCheckInClick = (flat) => {
-    setCheckInFlat(flat);
+  const handleCheckInClick = (flat, bookingDetails = {}) => {
+    setCheckInFlat({ ...flat, ...bookingDetails });
     setCurrentView('tenant-checkin');
   };
 

@@ -26,6 +26,11 @@ function CheckInFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedFlatId = searchParams.get('flat_id');
+  const queryBookingType = searchParams.get('booking_type');
+  const queryDays = searchParams.get('days');
+  const queryDailyRate = searchParams.get('daily_rate');
+  const queryCheckIn = searchParams.get('check_in');
+  const queryCheckOut = searchParams.get('check_out');
 
   const [flats, setFlats] = useState([]);
   const [selectedFlat, setSelectedFlat] = useState(null);
@@ -48,15 +53,16 @@ function CheckInFormContent() {
     emergency_contact_name: '',
     emergency_contact_relation: '',
     emergency_contact_phone: '',
-    booking_type: 'daily', // 'daily' or 'monthly'
-    check_in_date: new Date().toISOString().split('T')[0],
-    check_out_date: (() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 3);
+    booking_type: queryBookingType === 'monthly' ? 'monthly' : 'daily', // 'daily' or 'monthly'
+    check_in_date: queryCheckIn || new Date().toISOString().split('T')[0],
+    check_out_date: queryCheckOut || (() => {
+      const d = new Date(queryCheckIn || new Date());
+      const count = queryDays ? Math.max(1, parseInt(queryDays)) : 3;
+      d.setDate(d.getDate() + count);
       return d.toISOString().split('T')[0];
     })(),
-    total_days: 3,
-    daily_rate: 3000,
+    total_days: queryDays ? Math.max(1, parseInt(queryDays)) : 3,
+    daily_rate: queryDailyRate ? Number(queryDailyRate) : 3000,
     duration_months: 11,
     security_deposit: '0',
     monthly_rent: '',
@@ -104,12 +110,26 @@ function CheckInFormContent() {
           const match = list.find(f => String(f.id) === String(preselectedFlatId));
           if (match) {
             setSelectedFlat(match);
-            const dRate = match.daily_rate || (match.monthly_rent ? Math.round(Number(match.monthly_rent) / 30) : 3000);
+            const dRate = queryDailyRate ? Number(queryDailyRate) : (match.daily_rate || (match.monthly_rent ? Math.round(Number(match.monthly_rent) / 30) : 3000));
+            const daysCount = queryDays ? Math.max(1, parseInt(queryDays)) : 3;
+            const bType = queryBookingType === 'monthly' ? 'monthly' : 'daily';
+            const cIn = queryCheckIn || new Date().toISOString().split('T')[0];
+            const cOut = queryCheckOut || (() => {
+              const d = new Date(cIn);
+              d.setDate(d.getDate() + daysCount);
+              return d.toISOString().split('T')[0];
+            })();
+            const totalRent = bType === 'daily' ? daysCount * dRate : (Number(match.monthly_rent) || 0);
+
             setFormData(prev => ({
               ...prev,
-              monthly_rent: match.monthly_rent,
+              booking_type: bType,
+              check_in_date: cIn,
+              check_out_date: cOut,
+              total_days: daysCount,
               daily_rate: dRate,
-              paid_amount: prev.booking_type === 'daily' ? (currentDays * dRate).toString() : match.monthly_rent
+              monthly_rent: match.monthly_rent,
+              paid_amount: totalRent.toString()
             }));
           }
         } else if (list.length > 0) {
@@ -128,7 +148,7 @@ function CheckInFormContent() {
       }
     };
     loadFlats();
-  }, [preselectedFlatId]);
+  }, [preselectedFlatId, queryDays, queryDailyRate, queryCheckIn, queryCheckOut, queryBookingType]);
 
   const handleFlatChange = (flatId) => {
     const match = flats.find(f => String(f.id) === String(flatId));

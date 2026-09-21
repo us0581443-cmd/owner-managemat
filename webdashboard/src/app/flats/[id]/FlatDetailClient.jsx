@@ -40,6 +40,8 @@ export default function FlatDetailClient({ params }) {
   const [showBioModal, setShowBioModal] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  const [selectedDays, setSelectedDays] = useState(3);
+  const [checkInDate, setCheckInDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   const loadFlat = async () => {
     if (!flatId) return;
@@ -107,6 +109,22 @@ export default function FlatDetailClient({ params }) {
   const heroPhoto = photos[0] || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1000&auto=format&fit=crop&q=80';
   const isBooked = flat.status === 'Rented' || flat.status === 'Booked';
   const activeTenancy = flat.currentTenancy;
+
+  const flatDailyRate = flat?.daily_rate && Number(flat.daily_rate) > 0
+    ? Number(flat.daily_rate)
+    : (flat?.monthly_rent ? Math.round(Number(flat.monthly_rent) / 30) : 2500);
+
+  const calculatedRent = selectedDays * flatDailyRate;
+
+  const computedCheckOutDate = (() => {
+    try {
+      const d = new Date(checkInDate);
+      d.setDate(d.getDate() + Number(selectedDays || 1));
+      return d.toISOString().split('T')[0];
+    } catch (e) {
+      return '';
+    }
+  })();
 
   const handleWhatsAppTenant = () => {
     if (!flat.tenant_phone) return;
@@ -492,41 +510,219 @@ export default function FlatDetailClient({ params }) {
             <div style={{
               background: '#ffffff',
               borderRadius: 'var(--radius-lg)',
-              border: '1px dashed var(--color-coral-border)',
-              padding: '28px 22px',
-              textAlign: 'center',
-              boxShadow: 'var(--shadow-xs)'
+              border: '1px solid var(--color-mint-border)',
+              padding: '22px',
+              boxShadow: 'var(--shadow-sm)'
             }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'var(--color-coral-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 12px auto',
-                color: 'var(--color-coral)'
-              }}>
-                <UserPlus size={22} />
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  color: 'var(--color-mint)',
+                  background: 'var(--color-mint-light)',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-xs)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  ● Available for Booking
+                </span>
+                <span style={{ fontSize: '11px', color: '#64748B' }}>
+                  Per-Day / Short Stay
+                </span>
               </div>
 
-              <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--color-navy)' }}>
-                This Flat is Vacant
+              <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--color-navy)', marginBottom: '4px' }}>
+                Days-Wise Booking Calculator
               </h3>
-
-              <p style={{ fontSize: '13px', color: '#64748B', margin: '8px auto 20px auto', lineHeight: '1.5' }}>
-                Check in a new tenant now. Filling the 6-section registration will mark this flat as 'Booked' and sync with both mobile apps.
+              <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '16px' }}>
+                Select duration to dynamically calculate stay rent based on per-day rate.
               </p>
 
-              <Link
-                href={`/check-in?flat_id=${flat.id}`}
-                className="btn btn-mint"
-                style={{ width: '100%', padding: '12px', fontSize: '13.5px', justifyContent: 'center' }}
-              >
-                <UserPlus size={16} />
-                <span>+ Check-in Tenant (Flow B)</span>
-              </Link>
+              {/* Rate Highlight Strip */}
+              <div style={{
+                background: 'var(--color-ice-subtle)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '12px 14px',
+                marginBottom: '16px',
+                border: '0.5px solid rgba(14, 27, 60, 0.08)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <span style={{ fontSize: '11px', color: '#64748B', display: 'block' }}>Per-Day Rate</span>
+                  <strong style={{ fontSize: '16px', color: 'var(--color-navy)', fontFamily: 'var(--font-heading)' }}>
+                    PKR {flatDailyRate.toLocaleString()} <span style={{ fontSize: '11px', fontWeight: '500', color: '#64748B' }}>/ day</span>
+                  </strong>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '11px', color: '#64748B', display: 'block' }}>Standard Monthly</span>
+                  <span style={{ fontSize: '12px', color: '#475569', fontWeight: '600' }}>
+                    PKR {Number(flat.monthly_rent || 0).toLocaleString()} / mo
+                  </span>
+                </div>
+              </div>
+
+              {/* Quick Select Days Chips */}
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ fontSize: '11.5px', color: '#475569', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
+                  Select Days to Book:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', marginBottom: '6px' }}>
+                  {[1, 2, 3, 5, 7].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setSelectedDays(num)}
+                      style={{
+                        padding: '7px 4px',
+                        borderRadius: 'var(--radius-xs)',
+                        border: selectedDays === num ? '1.5px solid var(--color-navy)' : '1px solid #E2E8F0',
+                        background: selectedDays === num ? 'var(--color-navy)' : '#F8FAFC',
+                        color: selectedDays === num ? '#FFFFFF' : 'var(--color-navy)',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {num} {num === 1 ? 'Day' : 'Days'}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+                  {[10, 15, 30].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setSelectedDays(num)}
+                      style={{
+                        padding: '6px 4px',
+                        borderRadius: 'var(--radius-xs)',
+                        border: selectedDays === num ? '1.5px solid var(--color-navy)' : '1px solid #E2E8F0',
+                        background: selectedDays === num ? 'var(--color-navy)' : '#F8FAFC',
+                        color: selectedDays === num ? '#FFFFFF' : 'var(--color-navy)',
+                        fontSize: '11.5px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {num} Days
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Check-in Date & Custom Days Stepper */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px', marginBottom: '14px' }}>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#64748B', display: 'block', marginBottom: '4px' }}>Check-in Date</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={checkInDate}
+                    onChange={(e) => setCheckInDate(e.target.value)}
+                    style={{ fontSize: '12px', padding: '6px 8px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#64748B', display: 'block', marginBottom: '4px' }}>Custom Days</label>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDays(prev => Math.max(1, prev - 1))}
+                      style={{
+                        width: '30px',
+                        height: '32px',
+                        border: '1px solid #E2E8F0',
+                        background: '#F1F5F9',
+                        borderRadius: 'var(--radius-xs) 0 0 var(--radius-xs)',
+                        cursor: 'pointer',
+                        fontWeight: '700',
+                        fontSize: '14px'
+                      }}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      className="form-input"
+                      value={selectedDays}
+                      onChange={(e) => setSelectedDays(Math.max(1, parseInt(e.target.value) || 1))}
+                      style={{
+                        borderRadius: 0,
+                        textAlign: 'center',
+                        padding: '4px',
+                        fontSize: '13px',
+                        fontWeight: '700',
+                        height: '32px'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDays(prev => prev + 1)}
+                      style={{
+                        width: '30px',
+                        height: '32px',
+                        border: '1px solid #E2E8F0',
+                        background: '#F1F5F9',
+                        borderRadius: '0 var(--radius-xs) var(--radius-xs) 0',
+                        cursor: 'pointer',
+                        fontWeight: '700',
+                        fontSize: '14px'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Real-time Calculation Summary Box */}
+              <div style={{
+                background: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                borderRadius: 'var(--radius-xs)',
+                padding: '12px 14px',
+                marginBottom: '16px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#166534', marginBottom: '4px' }}>
+                  <span>Stay: {selectedDays} Days ({checkInDate} to {computedCheckOutDate})</span>
+                  <span>PKR {flatDailyRate.toLocaleString()} × {selectedDays}d</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px dashed #BBF7D0' }}>
+                  <strong style={{ fontSize: '13px', color: '#166534' }}>Total Rent Due:</strong>
+                  <strong style={{ fontSize: '18px', color: '#166534', fontFamily: 'var(--font-heading)' }}>
+                    PKR {calculatedRent.toLocaleString()}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <Link
+                  href={`/check-in?flat_id=${flat.id}&days=${selectedDays}&daily_rate=${flatDailyRate}&check_in=${checkInDate}&check_out=${computedCheckOutDate}&booking_type=daily`}
+                  className="btn btn-primary"
+                  style={{ width: '100%', padding: '12px', fontSize: '13.5px', justifyContent: 'center' }}
+                >
+                  <UserPlus size={16} />
+                  <span>Book for {selectedDays} Days (PKR {calculatedRent.toLocaleString()})</span>
+                </Link>
+
+                <Link
+                  href={`/check-in?flat_id=${flat.id}&booking_type=monthly`}
+                  className="btn btn-secondary"
+                  style={{ width: '100%', padding: '8px', fontSize: '12px', justifyContent: 'center', color: '#64748B' }}
+                >
+                  <span>Switch to Monthly Lease (PKR {Number(flat.monthly_rent || 0).toLocaleString()}/mo)</span>
+                </Link>
+              </div>
             </div>
           )}
         </div>

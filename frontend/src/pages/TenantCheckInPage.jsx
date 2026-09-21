@@ -24,21 +24,21 @@ export default function TenantCheckInPage({ flat, onBack, onCheckInComplete, sho
     emergency_contact_relation: '',
     emergency_contact_phone: '',
     // Section 5: Stay & Booking Details
-    booking_type: 'daily', // 'daily' or 'monthly'
-    check_in_date: new Date().toISOString().split('T')[0],
-    check_out_date: (() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 3);
+    booking_type: flat?.booking_type || 'daily', // 'daily' or 'monthly'
+    check_in_date: flat?.check_in_date || new Date().toISOString().split('T')[0],
+    check_out_date: flat?.check_out_date || (() => {
+      const d = new Date(flat?.check_in_date || new Date());
+      d.setDate(d.getDate() + (Number(flat?.total_days) || 3));
       return d.toISOString().split('T')[0];
     })(),
-    total_days: 3,
+    total_days: Number(flat?.total_days) || 3,
     daily_rate: flat?.daily_rate || (flat?.monthly_rent ? Math.round(Number(flat.monthly_rent) / 30) : 3000),
     duration_months: 1,
     security_deposit: '0',
     monthly_rent: flat?.monthly_rent || '',
     // Section 6: Initial Rent Payment Options
     payment_status: 'Paid', // 'Paid', 'Partial', 'Pending'
-    paid_amount: '',
+    paid_amount: ((Number(flat?.total_days) || 3) * Number(flat?.daily_rate || (flat?.monthly_rent ? Math.round(Number(flat.monthly_rent) / 30) : 3000))).toString(),
     payment_method: 'Cash',
     // Section 7: Documents
     cnic_doc: 'cnic_front_back_scanned.pdf',
