@@ -48,9 +48,17 @@ function CheckInFormContent() {
     emergency_contact_name: '',
     emergency_contact_relation: '',
     emergency_contact_phone: '',
+    booking_type: 'daily', // 'daily' or 'monthly'
     check_in_date: new Date().toISOString().split('T')[0],
+    check_out_date: (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 3);
+      return d.toISOString().split('T')[0];
+    })(),
+    total_days: 3,
+    daily_rate: 3000,
     duration_months: 11,
-    security_deposit: '',
+    security_deposit: '0',
     monthly_rent: '',
     payment_status: 'Paid', // 'Paid', 'Partial', 'Pending'
     paid_amount: '',
@@ -59,6 +67,27 @@ function CheckInFormContent() {
     lease_doc: 'standard_rental_agreement.pdf',
     guarantor_doc: 'guarantor_cnic_verified.pdf'
   });
+
+  const calculateDays = (start, end) => {
+    if (!start || !end) return 1;
+    const d1 = new Date(start);
+    const d2 = new Date(end);
+    const diff = Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 1;
+  };
+
+  const currentDays = formData.booking_type === 'daily'
+    ? calculateDays(formData.check_in_date, formData.check_out_date)
+    : (Number(formData.duration_months) || 1) * 30;
+
+  const currentDailyRate = Number(formData.daily_rate) || (selectedFlat?.daily_rate || (selectedFlat?.monthly_rent ? Math.round(Number(selectedFlat.monthly_rent) / 30) : 3000));
+
+  const totalStayRent = formData.booking_type === 'daily'
+    ? currentDays * currentDailyRate
+    : (Number(formData.monthly_rent) || Number(selectedFlat?.monthly_rent) || 0);
+
+  const depositVal = Number(formData.security_deposit || 0);
+  const totalMoveIn = totalStayRent + depositVal;
 
   const [cnicStatus, setCnicStatus] = useState(null);
   const [isCheckingCnic, setIsCheckingCnic] = useState(false);
@@ -75,21 +104,23 @@ function CheckInFormContent() {
           const match = list.find(f => String(f.id) === String(preselectedFlatId));
           if (match) {
             setSelectedFlat(match);
+            const dRate = match.daily_rate || (match.monthly_rent ? Math.round(Number(match.monthly_rent) / 30) : 3000);
             setFormData(prev => ({
               ...prev,
               monthly_rent: match.monthly_rent,
-              paid_amount: match.monthly_rent,
-              security_deposit: (Number(match.monthly_rent || 0) * 2).toString()
+              daily_rate: dRate,
+              paid_amount: prev.booking_type === 'daily' ? (currentDays * dRate).toString() : match.monthly_rent
             }));
           }
         } else if (list.length > 0) {
           const firstVacant = list.find(f => f.status === 'Vacant') || list[0];
           setSelectedFlat(firstVacant);
+          const dRate = firstVacant.daily_rate || (firstVacant.monthly_rent ? Math.round(Number(firstVacant.monthly_rent) / 30) : 3000);
           setFormData(prev => ({
             ...prev,
             monthly_rent: firstVacant.monthly_rent,
-            paid_amount: firstVacant.monthly_rent,
-            security_deposit: (Number(firstVacant.monthly_rent || 0) * 2).toString()
+            daily_rate: dRate,
+            paid_amount: prev.booking_type === 'daily' ? (currentDays * dRate).toString() : firstVacant.monthly_rent
           }));
         }
       } catch (err) {
@@ -103,10 +134,12 @@ function CheckInFormContent() {
     const match = flats.find(f => String(f.id) === String(flatId));
     if (match) {
       setSelectedFlat(match);
+      const dRate = match.daily_rate || (match.monthly_rent ? Math.round(Number(match.monthly_rent) / 30) : 3000);
       setFormData(prev => ({
         ...prev,
         monthly_rent: match.monthly_rent,
-        security_deposit: (Number(match.monthly_rent || 0) * 2).toString()
+        daily_rate: dRate,
+        paid_amount: prev.booking_type === 'daily' ? (currentDays * dRate).toString() : match.monthly_rent
       }));
     }
   };
@@ -156,9 +189,18 @@ function CheckInFormContent() {
 
     setIsSubmitting(true);
     try {
+      const finalPaid = formData.payment_status === 'Paid'
+        ? totalStayRent
+        : (formData.payment_status === 'Pending' ? 0 : (Number(formData.paid_amount) || 0));
+
       await api.checkInTenant({
         flat_id: selectedFlat.id,
-        ...formData
+        ...formData,
+        total_days: currentDays,
+        daily_rate: currentDailyRate,
+        monthly_rent: formData.monthly_rent || selectedFlat.monthly_rent,
+        total_rent: totalStayRent,
+        paid_amount: finalPaid
       });
       router.push(`/flats/${selectedFlat.id}`);
     } catch (err) {
@@ -167,10 +209,6 @@ function CheckInFormContent() {
       setIsSubmitting(false);
     }
   };
-
-  const rentVal = Number(formData.monthly_rent || 0);
-  const depositVal = Number(formData.security_deposit || 0);
-  const totalMoveIn = rentVal + depositVal;
 
   return (
     <div>
@@ -496,7 +534,7 @@ function CheckInFormContent() {
               </div>
             </div>
 
-            {/* Section 6: Lease Terms & Deposit */}
+            {/* Section 6: Booking Mode & Stay Terms */}
             <div style={{
               background: '#ffffff',
               borderRadius: 'var(--radius-lg)',
@@ -504,65 +542,254 @@ function CheckInFormContent() {
               border: '0.5px solid var(--color-border)',
               boxShadow: 'var(--shadow-xs)'
             }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--color-navy)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CreditCard size={17} color="var(--color-blue)" />
-                <span>6. Lease Agreement & Financial Terms</span>
-              </h3>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                <div>
-                  <label className="form-label">Check-in Date *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={formData.check_in_date}
-                    onChange={(e) => setFormData({ ...formData, check_in_date: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">Lease Duration (Months)</label>
-                  <select
-                    className="form-select"
-                    value={formData.duration_months}
-                    onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
-                  >
-                    <option value="6">6 Months</option>
-                    <option value="11">11 Months (Standard)</option>
-                    <option value="12">12 Months (1 Year)</option>
-                    <option value="24">24 Months (2 Years)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="form-label">Agreed Monthly Rent (PKR) *</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    value={formData.monthly_rent}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setFormData(prev => ({
-                        ...prev,
-                        monthly_rent: val,
-                        paid_amount: prev.payment_status === 'Paid' ? val : (prev.payment_status === 'Partial' ? (Number(val) / 2).toString() : prev.paid_amount)
-                      }));
-                    }}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">Security Deposit (PKR)</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    value={formData.security_deposit}
-                    onChange={(e) => setFormData({ ...formData, security_deposit: e.target.value })}
-                  />
-                </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--color-navy)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CreditCard size={17} color="var(--color-blue)" />
+                  <span>6. Booking Mode & Stay Terms *</span>
+                </h3>
+                <span style={{ fontSize: '12px', color: '#64748B' }}>
+                  Choose per-day charge or monthly rental
+                </span>
               </div>
+
+              {/* Mode Toggle */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '8px',
+                background: 'var(--color-ice-subtle)',
+                padding: '4px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border)',
+                marginBottom: '16px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const days = calculateDays(formData.check_in_date, formData.check_out_date);
+                    const rate = currentDailyRate;
+                    const total = days * rate;
+                    setFormData(prev => ({
+                      ...prev,
+                      booking_type: 'daily',
+                      paid_amount: prev.payment_status === 'Paid' ? total.toString() : (prev.payment_status === 'Partial' ? (total / 2).toString() : '0')
+                    }));
+                  }}
+                  style={{
+                    padding: '9px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: formData.booking_type === 'daily' ? '1px solid var(--color-blue)' : 'none',
+                    background: formData.booking_type === 'daily' ? 'var(--color-navy)' : 'transparent',
+                    color: formData.booking_type === 'daily' ? '#FFFFFF' : 'var(--color-navy)',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  📅 Per-Day Booking (Short Stay)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const rent = Number(formData.monthly_rent) || Number(selectedFlat?.monthly_rent) || 0;
+                    setFormData(prev => ({
+                      ...prev,
+                      booking_type: 'monthly',
+                      monthly_rent: rent.toString(),
+                      paid_amount: prev.payment_status === 'Paid' ? rent.toString() : (prev.payment_status === 'Partial' ? (rent / 2).toString() : '0')
+                    }));
+                  }}
+                  style={{
+                    padding: '9px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: formData.booking_type === 'monthly' ? '1px solid var(--color-blue)' : 'none',
+                    background: formData.booking_type === 'monthly' ? 'var(--color-navy)' : 'transparent',
+                    color: formData.booking_type === 'monthly' ? '#FFFFFF' : 'var(--color-navy)',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  🏢 Monthly Lease (Long Stay)
+                </button>
+              </div>
+
+              {formData.booking_type === 'daily' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label className="form-label">Check-in Date *</label>
+                      <input
+                        type="date"
+                        className="form-input"
+                        value={formData.check_in_date}
+                        onChange={(e) => {
+                          const newStart = e.target.value;
+                          const days = calculateDays(newStart, formData.check_out_date);
+                          setFormData(prev => ({
+                            ...prev,
+                            check_in_date: newStart,
+                            total_days: days
+                          }));
+                        }}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="form-label">Check-out Date *</label>
+                      <input
+                        type="date"
+                        className="form-input"
+                        value={formData.check_out_date}
+                        min={formData.check_in_date}
+                        onChange={(e) => {
+                          const newEnd = e.target.value;
+                          const days = calculateDays(formData.check_in_date, newEnd);
+                          setFormData(prev => ({
+                            ...prev,
+                            check_out_date: newEnd,
+                            total_days: days
+                          }));
+                        }}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label className="form-label">Stay Duration (Total Days)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        className="form-input"
+                        value={currentDays}
+                        onChange={(e) => {
+                          const dCount = Math.max(1, parseInt(e.target.value) || 1);
+                          const d = new Date(formData.check_in_date || new Date());
+                          d.setDate(d.getDate() + dCount);
+                          setFormData(prev => ({
+                            ...prev,
+                            total_days: dCount,
+                            check_out_date: d.toISOString().split('T')[0]
+                          }));
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="form-label">Rate Per Day (PKR) *</label>
+                      <input
+                        type="number"
+                        min="100"
+                        step="50"
+                        className="form-input"
+                        value={formData.daily_rate}
+                        onChange={(e) => setFormData({ ...formData, daily_rate: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Real-time Calculation Summary Box */}
+                  <div style={{
+                    background: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '14px 16px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '12.5px', color: '#64748B', fontWeight: '500' }}>Stay Duration:</span>
+                      <span style={{
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        color: '#0369A1',
+                        background: '#E0F2FE',
+                        padding: '2px 10px',
+                        borderRadius: 'var(--radius-xs)'
+                      }}>
+                        {currentDays} {currentDays === 1 ? 'Day / Night' : 'Days / Nights'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '12.5px', color: '#64748B' }}>Calculation:</span>
+                      <span style={{ fontSize: '12.5px', color: '#334155', fontWeight: '600' }}>
+                        {currentDays} days × PKR {currentDailyRate.toLocaleString()} / day
+                      </span>
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingTop: '10px',
+                      borderTop: '1px solid #E2E8F0'
+                    }}>
+                      <strong style={{ fontSize: '14px', color: 'var(--color-navy)' }}>Total Booking Rent:</strong>
+                      <strong style={{ fontSize: '18px', color: 'var(--color-navy)', fontFamily: 'var(--font-heading)' }}>
+                        PKR {totalStayRent.toLocaleString()}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div>
+                    <label className="form-label">Check-in Date *</label>
+                    <input
+                      type="date"
+                      className="form-input"
+                      value={formData.check_in_date}
+                      onChange={(e) => setFormData({ ...formData, check_in_date: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="form-label">Lease Duration (Months)</label>
+                    <select
+                      className="form-select"
+                      value={formData.duration_months}
+                      onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
+                    >
+                      <option value="6">6 Months</option>
+                      <option value="11">11 Months (Standard)</option>
+                      <option value="12">12 Months (1 Year)</option>
+                      <option value="24">24 Months (2 Years)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="form-label">Agreed Monthly Rent (PKR) *</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      value={formData.monthly_rent}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData(prev => ({
+                          ...prev,
+                          monthly_rent: val,
+                          paid_amount: prev.payment_status === 'Paid' ? val : (prev.payment_status === 'Partial' ? (Number(val) / 2).toString() : prev.paid_amount)
+                        }));
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="form-label">Security Deposit (PKR)</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      value={formData.security_deposit}
+                      onChange={(e) => setFormData({ ...formData, security_deposit: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* ================================================================
@@ -581,7 +808,7 @@ function CheckInFormContent() {
                   <span>7. Initial Rent Payment Status *</span>
                 </h3>
                 <span style={{ fontSize: '12px', color: '#64748B' }}>
-                  Choose whether first month rent is collected now
+                  Choose whether stay rent is settled now or pending
                 </span>
               </div>
 
@@ -589,14 +816,14 @@ function CheckInFormContent() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '16px' }}>
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, payment_status: 'Paid', paid_amount: prev.monthly_rent }))}
+                  onClick={() => setFormData(prev => ({ ...prev, payment_status: 'Paid', paid_amount: totalStayRent.toString() }))}
                   style={{
-                    padding: '12px 10px',
-                    borderRadius: '10px',
-                    border: formData.payment_status === 'Paid' ? '2px solid var(--color-mint)' : '1px solid var(--color-border)',
-                    background: formData.payment_status === 'Paid' ? 'var(--color-mint-light)' : '#FFFFFF',
-                    color: formData.payment_status === 'Paid' ? '#0B6947' : 'var(--color-navy)',
-                    fontWeight: '700',
+                    padding: '11px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: formData.payment_status === 'Paid' ? '1.5px solid #16A34A' : '1px solid var(--color-border)',
+                    background: formData.payment_status === 'Paid' ? '#F0FDF4' : '#FFFFFF',
+                    color: formData.payment_status === 'Paid' ? '#166534' : 'var(--color-navy)',
+                    fontWeight: '600',
                     fontSize: '13px',
                     cursor: 'pointer',
                     textAlign: 'center',
@@ -611,15 +838,15 @@ function CheckInFormContent() {
                   onClick={() => setFormData(prev => ({
                     ...prev,
                     payment_status: 'Partial',
-                    paid_amount: (Number(prev.monthly_rent || 0) / 2).toString()
+                    paid_amount: (totalStayRent / 2).toString()
                   }))}
                   style={{
-                    padding: '12px 10px',
-                    borderRadius: '10px',
-                    border: formData.payment_status === 'Partial' ? '2px solid var(--color-amber)' : '1px solid var(--color-border)',
-                    background: formData.payment_status === 'Partial' ? 'var(--color-amber-light)' : '#FFFFFF',
-                    color: formData.payment_status === 'Partial' ? '#B45309' : 'var(--color-navy)',
-                    fontWeight: '700',
+                    padding: '11px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: formData.payment_status === 'Partial' ? '1.5px solid #D97706' : '1px solid var(--color-border)',
+                    background: formData.payment_status === 'Partial' ? '#FFFBEB' : '#FFFFFF',
+                    color: formData.payment_status === 'Partial' ? '#92400E' : 'var(--color-navy)',
+                    fontWeight: '600',
                     fontSize: '13px',
                     cursor: 'pointer',
                     textAlign: 'center',
@@ -633,12 +860,12 @@ function CheckInFormContent() {
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, payment_status: 'Pending', paid_amount: '0' }))}
                   style={{
-                    padding: '12px 10px',
-                    borderRadius: '10px',
-                    border: formData.payment_status === 'Pending' ? '2px solid var(--color-coral)' : '1px solid var(--color-border)',
-                    background: formData.payment_status === 'Pending' ? 'var(--color-coral-light)' : '#FFFFFF',
-                    color: formData.payment_status === 'Pending' ? '#B91C1C' : 'var(--color-navy)',
-                    fontWeight: '700',
+                    padding: '11px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: formData.payment_status === 'Pending' ? '1.5px solid #DC2626' : '1px solid var(--color-border)',
+                    background: formData.payment_status === 'Pending' ? '#FEF2F2' : '#FFFFFF',
+                    color: formData.payment_status === 'Pending' ? '#991B1B' : 'var(--color-navy)',
+                    fontWeight: '600',
                     fontSize: '13px',
                     cursor: 'pointer',
                     textAlign: 'center',
@@ -652,9 +879,9 @@ function CheckInFormContent() {
               {/* Conditional Options */}
               {formData.payment_status === 'Paid' && (
                 <div style={{
-                  background: 'var(--color-mint-light)',
-                  border: '1px solid var(--color-mint-border)',
-                  borderRadius: '10px',
+                  background: '#F0FDF4',
+                  border: '1px solid #BBF7D0',
+                  borderRadius: 'var(--radius-md)',
                   padding: '14px 16px',
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -662,18 +889,18 @@ function CheckInFormContent() {
                   alignItems: 'center'
                 }}>
                   <div>
-                    <span style={{ fontSize: '12px', color: '#065F46', display: 'block' }}>Collecting in Full:</span>
-                    <strong style={{ fontSize: '18px', color: '#065F46', fontFamily: 'var(--font-heading)' }}>
-                      PKR {Number(formData.monthly_rent || 0).toLocaleString()}
+                    <span style={{ fontSize: '12px', color: '#166534', display: 'block', fontWeight: '500' }}>Collecting in Full:</span>
+                    <strong style={{ fontSize: '18px', color: '#166534', fontFamily: 'var(--font-heading)' }}>
+                      PKR {totalStayRent.toLocaleString()}
                     </strong>
                   </div>
                   <div>
-                    <label className="form-label" style={{ color: '#065F46', fontSize: '11.5px' }}>Payment Method</label>
+                    <label className="form-label" style={{ color: '#166534', fontSize: '11.5px' }}>Payment Method</label>
                     <select
                       className="form-select"
                       value={formData.payment_method}
                       onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-                      style={{ background: '#FFFFFF', borderColor: 'var(--color-mint-border)' }}
+                      style={{ background: '#FFFFFF', borderColor: '#BBF7D0' }}
                     >
                       <option value="Cash">Cash</option>
                       <option value="Bank Transfer">Bank Transfer</option>
@@ -686,26 +913,26 @@ function CheckInFormContent() {
 
               {formData.payment_status === 'Partial' && (
                 <div style={{
-                  background: 'var(--color-amber-light)',
-                  border: '1px solid var(--color-amber-border)',
-                  borderRadius: '10px',
+                  background: '#FFFBEB',
+                  border: '1px solid #FDE68A',
+                  borderRadius: 'var(--radius-md)',
                   padding: '14px 16px'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '12px', color: '#92400E', fontWeight: '700' }}>
+                    <span style={{ fontSize: '12px', color: '#92400E', fontWeight: '600' }}>
                       Partial Payment Received Now:
                     </span>
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, paid_amount: (Number(prev.monthly_rent || 0) / 2).toString() }))}
+                      onClick={() => setFormData(prev => ({ ...prev, paid_amount: (totalStayRent / 2).toString() }))}
                       style={{
                         background: '#92400E',
                         color: '#FFFFFF',
                         border: 'none',
-                        borderRadius: '6px',
+                        borderRadius: 'var(--radius-xs)',
                         padding: '4px 10px',
                         fontSize: '11px',
-                        fontWeight: '700',
+                        fontWeight: '600',
                         cursor: 'pointer'
                       }}
                     >
@@ -721,7 +948,7 @@ function CheckInFormContent() {
                         className="form-input"
                         value={formData.paid_amount}
                         onChange={(e) => setFormData({ ...formData, paid_amount: e.target.value })}
-                        style={{ background: '#FFFFFF', borderColor: 'var(--color-amber-border)' }}
+                        style={{ background: '#FFFFFF', borderColor: '#FDE68A' }}
                       />
                     </div>
                     <div>
@@ -730,7 +957,7 @@ function CheckInFormContent() {
                         className="form-select"
                         value={formData.payment_method}
                         onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-                        style={{ background: '#FFFFFF', borderColor: 'var(--color-amber-border)' }}
+                        style={{ background: '#FFFFFF', borderColor: '#FDE68A' }}
                       >
                         <option value="Cash">Cash</option>
                         <option value="Bank Transfer">Bank Transfer</option>
@@ -750,21 +977,21 @@ function CheckInFormContent() {
                     color: '#92400E'
                   }}>
                     <span>Remaining Balance Due (will be tracked as Pending):</span>
-                    <strong>PKR {Math.max(0, Number(formData.monthly_rent || 0) - Number(formData.paid_amount || 0)).toLocaleString()}</strong>
+                    <strong>PKR {Math.max(0, totalStayRent - Number(formData.paid_amount || 0)).toLocaleString()}</strong>
                   </div>
                 </div>
               )}
 
               {formData.payment_status === 'Pending' && (
                 <div style={{
-                  background: 'var(--color-ice-subtle)',
-                  border: '1px dashed var(--color-border)',
-                  borderRadius: '10px',
+                  background: '#F8FAFC',
+                  border: '1px dashed #CBD5E1',
+                  borderRadius: 'var(--radius-md)',
                   padding: '14px 16px',
                   fontSize: '12.5px',
                   color: '#64748B'
                 }}>
-                  No payment collected today. Full rent of <strong>PKR {Number(formData.monthly_rent || 0).toLocaleString()}</strong> will be recorded as <strong>Pending Due</strong> and will appear in Rent Due financials until marked paid in the Customer record.
+                  No payment collected today. Full rent of <strong>PKR {totalStayRent.toLocaleString()}</strong> will be recorded as <strong>Pending Due</strong> and will appear in Rent Due financials until marked paid in the Customer record.
                 </div>
               )}
             </div>
@@ -864,14 +1091,16 @@ function CheckInFormContent() {
                   {/* Financial Move-In Breakdown */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
-                      <span>First Month Rent:</span>
-                      <strong style={{ color: 'var(--color-navy)' }}>PKR {rentVal.toLocaleString()}</strong>
+                      <span>{formData.booking_type === 'daily' ? `Stay Rent (${currentDays} Days):` : 'First Month Rent:'}</span>
+                      <strong style={{ color: 'var(--color-navy)' }}>PKR {totalStayRent.toLocaleString()}</strong>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
-                      <span>Security Deposit (Refundable):</span>
-                      <strong style={{ color: 'var(--color-navy)' }}>PKR {depositVal.toLocaleString()}</strong>
-                    </div>
+                    {formData.booking_type === 'monthly' && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
+                        <span>Security Deposit (Refundable):</span>
+                        <strong style={{ color: 'var(--color-navy)' }}>PKR {depositVal.toLocaleString()}</strong>
+                      </div>
+                    )}
 
                     <div style={{
                       display: 'flex',
@@ -882,7 +1111,7 @@ function CheckInFormContent() {
                       fontSize: '13.5px'
                     }}>
                       <strong style={{ color: 'var(--color-navy)' }}>Total Due on Move-in:</strong>
-                      <strong style={{ color: 'var(--color-blue)', fontFamily: 'var(--font-heading)' }}>
+                      <strong style={{ color: 'var(--color-navy)', fontFamily: 'var(--font-heading)' }}>
                         PKR {totalMoveIn.toLocaleString()}
                       </strong>
                     </div>

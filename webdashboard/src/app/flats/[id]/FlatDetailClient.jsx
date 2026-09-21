@@ -256,8 +256,8 @@ export default function FlatDetailClient({ params }) {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '14px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+              gap: '12px',
               textAlign: 'left'
             }}>
               <div style={{ background: 'var(--color-ice-subtle)', padding: '12px', borderRadius: '8px' }}>
@@ -276,8 +276,15 @@ export default function FlatDetailClient({ params }) {
               </div>
 
               <div style={{ background: 'var(--color-ice-subtle)', padding: '12px', borderRadius: '8px' }}>
+                <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Daily Rate</span>
+                <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>
+                  PKR {Number(flat.daily_rate || Math.round(Number(flat.monthly_rent || 0) / 30)).toLocaleString()} /d
+                </strong>
+              </div>
+
+              <div style={{ background: 'var(--color-ice-subtle)', padding: '12px', borderRadius: '8px' }}>
                 <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Monthly Rent</span>
-                <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>PKR {Number(flat.monthly_rent).toLocaleString()}</strong>
+                <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>PKR {Number(flat.monthly_rent).toLocaleString()} /m</strong>
               </div>
             </div>
           </div>
@@ -427,21 +434,33 @@ export default function FlatDetailClient({ params }) {
                 </div>
 
                 <div>
-                  <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Duration</span>
-                  <strong style={{ color: 'var(--color-navy)' }}>{activeTenancy ? `${activeTenancy.duration_months} Months` : '11 Months'}</strong>
-                </div>
-
-                <div>
-                  <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Monthly Rent</span>
+                  <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>
+                    {activeTenancy?.booking_type === 'daily' ? 'Stay Duration' : 'Duration'}
+                  </span>
                   <strong style={{ color: 'var(--color-navy)' }}>
-                    PKR {activeTenancy ? Number(activeTenancy.rent_agreed).toLocaleString() : Number(flat.monthly_rent).toLocaleString()}
+                    {activeTenancy?.booking_type === 'daily' 
+                      ? `${activeTenancy.total_days || 1} Days`
+                      : (activeTenancy ? `${activeTenancy.duration_months} Months` : '11 Months')}
                   </strong>
                 </div>
 
                 <div>
-                  <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Security Deposit</span>
+                  <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>
+                    {activeTenancy?.booking_type === 'daily' ? 'Stay Rent (Total)' : 'Monthly Rent'}
+                  </span>
                   <strong style={{ color: 'var(--color-navy)' }}>
-                    PKR {activeTenancy ? Number(activeTenancy.deposit_amount).toLocaleString() : 'N/A'}
+                    PKR {activeTenancy ? Number(activeTenancy.total_rent || activeTenancy.rent_agreed).toLocaleString() : Number(flat.monthly_rent).toLocaleString()}
+                  </strong>
+                </div>
+
+                <div>
+                  <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>
+                    {activeTenancy?.booking_type === 'daily' ? 'Rate / Day' : 'Security Deposit'}
+                  </span>
+                  <strong style={{ color: 'var(--color-navy)' }}>
+                    {activeTenancy?.booking_type === 'daily'
+                      ? `PKR ${Number(activeTenancy.daily_rate || flat.daily_rate || 3000).toLocaleString()}`
+                      : (activeTenancy ? `PKR ${Number(activeTenancy.deposit_amount || 0).toLocaleString()}` : 'N/A')}
                   </strong>
                 </div>
               </div>

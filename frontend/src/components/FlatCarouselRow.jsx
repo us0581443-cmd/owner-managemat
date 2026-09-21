@@ -122,13 +122,13 @@ export default function FlatCarouselRow({
                 {/* Pricing & Manage Action */}
                 <div className="card-footer-row">
                   <div>
-                    <span style={{ fontSize: '9.5px', color: '#94A3B8', display: 'block', textTransform: 'uppercase', letterSpacing: '0.4px', fontWeight: '600' }}>
-                      Monthly Rent
-                    </span>
-                    <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                      <span className="card-price-val">PKR {Number(flat.monthly_rent).toLocaleString()}</span>
-                      <span className="card-price-period">/mo</span>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                      <span className="card-price-val">PKR {Number(flat.daily_rate || Math.round(Number(flat.monthly_rent || 0) / 30)).toLocaleString()}</span>
+                      <span className="card-price-period">/day</span>
                     </div>
+                    <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', fontWeight: '500' }}>
+                      PKR {Number(flat.monthly_rent).toLocaleString()} /mo
+                    </span>
                   </div>
 
                   <span className="card-view-btn">

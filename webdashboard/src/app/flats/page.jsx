@@ -491,10 +491,14 @@ function FlatsContent() {
                   {/* Action Bar */}
                   <div className="property-action-bar">
                     <div>
-                      <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block' }}>Monthly Rent</span>
-                      <span className="property-rent-val">
-                        PKR {Number(flat.monthly_rent).toLocaleString()}
-                        <span style={{ fontSize: '11px', fontWeight: '400', color: '#94A3B8' }}>/mo</span>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                        <span className="property-rent-val">
+                          PKR {Number(flat.daily_rate || Math.round(Number(flat.monthly_rent || 0) / 30)).toLocaleString()}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: '500', color: '#64748B' }}>/day</span>
+                      </div>
+                      <span style={{ fontSize: '11px', color: '#64748B', display: 'block', fontWeight: '500' }}>
+                        PKR {Number(flat.monthly_rent).toLocaleString()} /mo
                       </span>
                     </div>
 

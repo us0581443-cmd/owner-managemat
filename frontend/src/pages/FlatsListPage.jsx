@@ -166,9 +166,10 @@ export default function FlatsListPage({
                   <div style={{ fontSize: '11px', color: '#94A3B8' }}>
                     Added: {flat.created_at ? flat.created_at.slice(0, 16) : 'N/A'}
                   </div>
-                  <div className="flat-rent-amount" style={{ marginTop: '2px' }}>
-                    PKR {Number(flat.monthly_rent).toLocaleString()}
-                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: '400' }}> / mo</span>
+                  <div className="flat-rent-amount" style={{ marginTop: '2px', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                    PKR {Number(flat.daily_rate || Math.round(Number(flat.monthly_rent || 0) / 30)).toLocaleString()}
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: '500' }}>/day</span>
+                    <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400', marginLeft: '4px' }}>• PKR {Number(flat.monthly_rent).toLocaleString()}/mo</span>
                   </div>
                 </div>
 

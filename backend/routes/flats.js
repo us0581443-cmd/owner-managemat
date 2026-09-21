@@ -116,7 +116,7 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   try {
     const ownerId = req.ownerId || 1;
-    const { flat_number, address, building_name, bedrooms, size, monthly_rent, photos } = req.body;
+    const { flat_number, address, building_name, bedrooms, size, monthly_rent, daily_rate, photos } = req.body;
     const finalAddress = (address || building_name || '').trim();
 
     if (!flat_number || !finalAddress || !bedrooms || !size || !monthly_rent) {
@@ -125,6 +125,8 @@ router.post('/', (req, res) => {
         error: 'Flat number, location/address, bedrooms, size, and monthly rent are required.'
       });
     }
+
+    const calculatedDailyRate = daily_rate ? parseFloat(daily_rate) : Math.round(parseFloat(monthly_rent) / 30);
 
     let photosJson;
     if (photos) {
@@ -136,8 +138,8 @@ router.post('/', (req, res) => {
     }
 
     const result = run(`
-      INSERT INTO flats (owner_id, flat_number, address, bedrooms, size, monthly_rent, status, photos, current_tenant_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 'Vacant', ?, NULL, datetime('now', 'localtime'), datetime('now', 'localtime'))
+      INSERT INTO flats (owner_id, flat_number, address, bedrooms, size, monthly_rent, daily_rate, status, photos, current_tenant_id, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'Vacant', ?, NULL, datetime('now', 'localtime'), datetime('now', 'localtime'))
     `, [
       ownerId,
       flat_number.trim(),
@@ -145,6 +147,7 @@ router.post('/', (req, res) => {
       bedrooms.trim(),
       size.trim(),
       parseFloat(monthly_rent),
+      calculatedDailyRate,
       photosJson
     ]);
 
@@ -166,7 +169,7 @@ router.put('/:id', (req, res) => {
   try {
     const ownerId = req.ownerId || 1;
     const { id } = req.params;
-    const { flat_number, address, building_name, bedrooms, size, monthly_rent, photos } = req.body;
+    const { flat_number, address, building_name, bedrooms, size, monthly_rent, daily_rate, photos } = req.body;
 
     const existing = get('SELECT * FROM flats WHERE id = ? AND owner_id = ?', [id, ownerId]);
     if (!existing) {
@@ -178,6 +181,11 @@ router.put('/:id', (req, res) => {
       ? (typeof photos === 'string' ? photos : JSON.stringify(photos))
       : existing.photos;
 
+    const newMonthlyRent = monthly_rent ? parseFloat(monthly_rent) : existing.monthly_rent;
+    const newDailyRate = daily_rate 
+      ? parseFloat(daily_rate) 
+      : (existing.daily_rate && existing.daily_rate > 0 ? existing.daily_rate : Math.round(newMonthlyRent / 30));
+
     run(`
       UPDATE flats
       SET flat_number = ?,
@@ -185,6 +193,7 @@ router.put('/:id', (req, res) => {
           bedrooms = ?,
           size = ?,
           monthly_rent = ?,
+          daily_rate = ?,
           photos = ?,
           updated_at = datetime('now', 'localtime')
       WHERE id = ? AND owner_id = ?
@@ -193,7 +202,8 @@ router.put('/:id', (req, res) => {
       finalAddress,
       bedrooms ? bedrooms.trim() : existing.bedrooms,
       size ? size.trim() : existing.size,
-      monthly_rent ? parseFloat(monthly_rent) : existing.monthly_rent,
+      newMonthlyRent,
+      newDailyRate,
       photosJson,
       id,
       ownerId

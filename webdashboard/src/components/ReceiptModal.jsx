@@ -85,13 +85,25 @@ export default function ReceiptModal({ isOpen, receipt, onClose }) {
               </span>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8' }}
-          >
-            <X size={20} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              className="corner-pdf-btn"
+              style={{ position: 'static' }}
+              onClick={handleDownloadPdf}
+              disabled={isDownloading}
+              title="Download Official PDF Receipt"
+            >
+              <Download size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8' }}
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <div className="modal-body" style={{ padding: '20px' }}>
@@ -184,39 +196,27 @@ export default function ReceiptModal({ isOpen, receipt, onClose }) {
           </div>
         </div>
 
-        <div className="modal-footer" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr', gap: '8px' }}>
-          <button
-            type="button"
-            className="btn btn-navy btn-sm"
-            onClick={handleDownloadPdf}
-            disabled={isDownloading}
-            style={{ width: '100%', padding: '8px 12px' }}
-            title="Download PDF document"
-          >
-            <Download size={14} />
-            <span>{isDownloading ? 'Generating...' : 'Download PDF'}</span>
-          </button>
-
+        <div className="modal-footer" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           <button
             type="button"
             className="btn btn-mint btn-sm"
-            style={{ width: '100%', padding: '8px 12px' }}
+            style={{ width: '100%', padding: '9px 12px', fontSize: '13px', fontWeight: '600' }}
             onClick={handleWhatsApp}
             title="Share receipt directly on WhatsApp"
           >
             <Send size={14} />
-            <span>WhatsApp</span>
+            <span>Share WhatsApp</span>
           </button>
 
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            style={{ width: '100%', padding: '8px 10px' }}
+            style={{ width: '100%', padding: '9px 12px', fontSize: '13px', fontWeight: '600' }}
             onClick={handlePrint}
             title="Print or Save via Browser"
           >
             <Printer size={14} />
-            <span>Print</span>
+            <span>Print Invoice</span>
           </button>
         </div>
       </div>

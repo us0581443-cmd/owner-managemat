@@ -106,26 +106,32 @@ export default function FlatDetailPage({
       {/* Specs Overview Box */}
       <div style={{
         background: '#ffffff',
-        borderRadius: 'var(--radius-lg)',
-        padding: '16px',
-        border: '0.5px solid var(--color-border)',
+        borderRadius: 'var(--radius-md)',
+        padding: '14px',
+        border: '1px solid #E2E8F0',
         marginBottom: '16px',
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '10px',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '8px',
         textAlign: 'center'
       }}>
         <div>
-          <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Bedrooms</span>
-          <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>{flat.bedrooms}</strong>
+          <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Bedrooms</span>
+          <strong style={{ fontSize: '14px', color: 'var(--color-navy)' }}>{flat.bedrooms}</strong>
         </div>
         <div>
-          <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Size</span>
-          <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>{flat.size}</strong>
+          <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Size</span>
+          <strong style={{ fontSize: '14px', color: 'var(--color-navy)' }}>{flat.size}</strong>
         </div>
         <div>
-          <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Monthly Rent</span>
-          <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>PKR {Number(flat.monthly_rent).toLocaleString()}</strong>
+          <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Daily Rate</span>
+          <strong style={{ fontSize: '14px', color: 'var(--color-navy)' }}>
+            PKR {Number(flat.daily_rate || Math.round(Number(flat.monthly_rent || 0) / 30)).toLocaleString()} /d
+          </strong>
+        </div>
+        <div>
+          <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Monthly Rent</span>
+          <strong style={{ fontSize: '14px', color: 'var(--color-navy)' }}>PKR {Number(flat.monthly_rent).toLocaleString()} /m</strong>
         </div>
       </div>
 
@@ -133,16 +139,16 @@ export default function FlatDetailPage({
       {isBooked ? (
         <div style={{
           background: '#ffffff',
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid var(--color-mint)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid #BBF7D0',
           padding: '18px',
           marginBottom: '20px',
-          boxShadow: 'var(--shadow-sm)'
+          boxShadow: 'var(--shadow-xs)'
         }}>
           {/* Booking Summary Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
             <div>
-              <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--color-mint)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+              <span style={{ fontSize: '11px', fontWeight: '700', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
                 CURRENT TENANCY & BOOKING
               </span>
               <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--color-navy)', marginTop: '2px' }}>
@@ -156,33 +162,49 @@ export default function FlatDetailPage({
             )}
           </div>
 
-          {/* Booking Summary Details Grid (who, from when, for how long, at what price) */}
+          {/* Booking Summary Details Grid */}
           <div style={{
             background: 'var(--color-ice-subtle)',
-            borderRadius: '12px',
+            borderRadius: 'var(--radius-sm)',
             padding: '12px',
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: '10px',
             fontSize: '12.5px',
             marginBottom: '14px',
-            border: '0.5px solid rgba(14, 27, 60, 0.08)'
+            border: '1px solid #E2E8F0'
           }}>
             <div>
               <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Check-in Date:</span>
               <strong style={{ color: 'var(--color-navy)' }}>{activeTenancy ? activeTenancy.check_in_date : 'Active'}</strong>
             </div>
             <div>
-              <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Lease Duration:</span>
-              <strong style={{ color: 'var(--color-navy)' }}>{activeTenancy ? `${activeTenancy.duration_months} Months` : 'N/A'}</strong>
+              <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>
+                {activeTenancy?.booking_type === 'daily' ? 'Stay Duration:' : 'Lease Duration:'}
+              </span>
+              <strong style={{ color: 'var(--color-navy)' }}>
+                {activeTenancy?.booking_type === 'daily' 
+                  ? `${activeTenancy.total_days || 1} Days`
+                  : (activeTenancy ? `${activeTenancy.duration_months} Months` : 'N/A')}
+              </strong>
             </div>
             <div>
-              <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Agreed Rent:</span>
-              <strong style={{ color: 'var(--color-navy)' }}>PKR {Number(flat.monthly_rent).toLocaleString()}</strong>
+              <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>
+                {activeTenancy?.booking_type === 'daily' ? 'Stay Rent (Total):' : 'Agreed Rent:'}
+              </span>
+              <strong style={{ color: 'var(--color-navy)' }}>
+                PKR {activeTenancy ? Number(activeTenancy.total_rent || activeTenancy.monthly_rent || flat.monthly_rent).toLocaleString() : Number(flat.monthly_rent).toLocaleString()}
+              </strong>
             </div>
             <div>
-              <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Security Deposit:</span>
-              <strong style={{ color: 'var(--color-navy)' }}>PKR {activeTenancy ? Number(activeTenancy.security_deposit).toLocaleString() : '0'}</strong>
+              <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>
+                {activeTenancy?.booking_type === 'daily' ? 'Rate Per Day:' : 'Security Deposit:'}
+              </span>
+              <strong style={{ color: 'var(--color-navy)' }}>
+                {activeTenancy?.booking_type === 'daily'
+                  ? `PKR ${Number(activeTenancy.daily_rate || flat.daily_rate || 3000).toLocaleString()}`
+                  : `PKR ${activeTenancy ? Number(activeTenancy.security_deposit || 0).toLocaleString() : '0'}`}
+              </strong>
             </div>
             <div>
               <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Phone:</span>

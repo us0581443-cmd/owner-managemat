@@ -65,10 +65,14 @@ router.post('/check-in', (req, res) => {
       emergency_contact_name,
       emergency_contact_relation,
       emergency_contact_phone,
-      // Section 5: Lease Details
+      // Section 5: Lease & Stay Details
+      booking_type = 'daily', // 'daily' or 'monthly'
       check_in_date,
-      duration_months,
-      security_deposit,
+      check_out_date,
+      total_days,
+      daily_rate,
+      duration_months = 1,
+      security_deposit = 0,
       monthly_rent,
       // Section 6: Documents
       cnic_doc,
@@ -80,10 +84,10 @@ router.post('/check-in', (req, res) => {
       payment_method = 'Cash'
     } = req.body;
 
-    if (!flat_id || !name || !cnic || !phone || !check_in_date || !duration_months || !monthly_rent) {
+    if (!flat_id || !name || !cnic || !phone || !check_in_date) {
       return res.status(400).json({
         success: false,
-        error: 'Flat, Name, CNIC, Phone, Check-in Date, Duration, and Rent Price are required.'
+        error: 'Flat, Name, CNIC, Phone, and Check-in Date are required.'
       });
     }
 
@@ -97,6 +101,44 @@ router.post('/check-in', (req, res) => {
         success: false,
         error: `Flat ${flat.flat_number} is already booked! Please checkout the current tenant first.`
       });
+    }
+
+    // Calculate stay duration and charges
+    let stayDays = parseInt(total_days) || 1;
+    let ratePerDay = parseFloat(daily_rate) || 0;
+    let computedCheckOutDate = check_out_date || null;
+
+    if (check_in_date && check_out_date) {
+      const d1 = new Date(check_in_date);
+      const d2 = new Date(check_out_date);
+      const diffTime = d2.getTime() - d1.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 0) stayDays = diffDays;
+    } else if (check_in_date && stayDays > 0) {
+      const d1 = new Date(check_in_date);
+      d1.setDate(d1.getDate() + stayDays);
+      computedCheckOutDate = d1.toISOString().split('T')[0];
+    }
+
+    if (!ratePerDay) {
+      if (flat.daily_rate && flat.daily_rate > 0) {
+        ratePerDay = flat.daily_rate;
+      } else if (flat.monthly_rent && flat.monthly_rent > 0) {
+        ratePerDay = Math.round(flat.monthly_rent / 30);
+      } else {
+        ratePerDay = 1000;
+      }
+    }
+
+    let calculatedTotalRent = 0;
+    let billingDescription = '';
+
+    if (booking_type === 'daily') {
+      calculatedTotalRent = stayDays * ratePerDay;
+      billingDescription = `${stayDays} Days Stay (${check_in_date} to ${computedCheckOutDate || 'TBD'})`;
+    } else {
+      calculatedTotalRent = parseFloat(monthly_rent) || flat.monthly_rent || (stayDays * ratePerDay);
+      billingDescription = new Date(check_in_date).toLocaleString('default', { month: 'long', year: 'numeric' });
     }
 
     const cleanCnic = cnic.trim();
@@ -191,20 +233,26 @@ router.post('/check-in', (req, res) => {
       currentStays = 1;
     }
 
-    // 2. Create Tenancy Record
+    // 2. Create Tenancy Record (with Days-wise parameters)
     const tenancyResult = run(`
       INSERT INTO tenancies (
-        owner_id, flat_id, customer_id, check_in_date, duration_months,
+        owner_id, flat_id, customer_id, booking_type, check_in_date, check_out_date,
+        total_days, daily_rate, total_rent, duration_months,
         security_deposit, monthly_rent, status, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', datetime('now', 'localtime'))
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', datetime('now', 'localtime'))
     `, [
       ownerId,
       flat_id,
       customerId,
+      booking_type,
       check_in_date,
-      parseInt(duration_months),
+      computedCheckOutDate,
+      stayDays,
+      ratePerDay,
+      calculatedTotalRent,
+      parseInt(duration_months) || 1,
       parseFloat(security_deposit) || 0,
-      parseFloat(monthly_rent)
+      calculatedTotalRent
     ]);
 
     // 3. Mark Flat as 'Booked' and link current tenant
@@ -213,12 +261,13 @@ router.post('/check-in', (req, res) => {
       SET status = 'Booked',
           current_tenant_id = ?,
           monthly_rent = ?,
+          daily_rate = ?,
           updated_at = datetime('now', 'localtime')
       WHERE id = ? AND owner_id = ?
-    `, [customerId, parseFloat(monthly_rent), flat_id, ownerId]);
+    `, [customerId, calculatedTotalRent, ratePerDay, flat_id, ownerId]);
 
     // 4. Generate first rent payment record with specified payment status
-    const rentAmount = parseFloat(monthly_rent);
+    const rentAmount = calculatedTotalRent;
     let resolvedStatus = 'Pending';
     let resolvedPaidAmount = 0;
     let resolvedPaidDate = null;
@@ -253,16 +302,16 @@ router.post('/check-in', (req, res) => {
       resolvedPaymentMethod = null;
     }
 
-    const monthYear = new Date(check_in_date).toLocaleString('default', { month: 'long', year: 'numeric' });
     const paymentInsert = run(`
       INSERT INTO payments (
-        owner_id, flat_id, customer_id, month_year, amount, paid_amount, due_date, status, paid_date, payment_method, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        owner_id, flat_id, customer_id, month_year, booking_details, amount, paid_amount, due_date, status, paid_date, payment_method, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
     `, [
       ownerId,
       flat_id,
       customerId,
-      monthYear || 'Current Month',
+      billingDescription,
+      `${stayDays} Days @ PKR ${ratePerDay.toLocaleString()}/day`,
       rentAmount,
       resolvedPaidAmount,
       check_in_date,

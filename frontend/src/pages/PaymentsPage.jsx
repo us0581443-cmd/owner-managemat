@@ -151,24 +151,52 @@ export default function PaymentsPage({
               <div
                 key={payment.id}
                 style={{
+                  position: 'relative',
                   background: '#ffffff',
-                  border: '0.5px solid var(--color-border)',
-                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: 'var(--radius-md)',
                   padding: '16px',
                   marginBottom: '12px',
                   boxShadow: 'var(--shadow-xs)'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                {/* Elegant Corner PDF Icon Button */}
+                <button
+                  type="button"
+                  className="corner-pdf-btn"
+                  onClick={() => {
+                    try {
+                      downloadReceiptPdf(payment, payment.status === 'Paid' ? 'Rent_Receipt' : 'Rent_Invoice');
+                    } catch (e) {
+                      alert('Error generating PDF: ' + (e.message || e));
+                    }
+                  }}
+                  title="Download PDF"
+                >
+                  <Download size={13} />
+                </button>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: '36px' }}>
                   <div>
-                    <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>
-                      {payment.flat_number}
-                    </strong>
-                    <div style={{ fontSize: '13px', color: '#475569', marginTop: '2px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>
+                        {payment.flat_number}
+                      </strong>
+                      <span style={{
+                        fontSize: '11px',
+                        color: '#64748B',
+                        background: '#F1F5F9',
+                        padding: '1px 6px',
+                        borderRadius: 'var(--radius-xs)'
+                      }}>
+                        {payment.building_name || 'Unit'}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#334155', marginTop: '3px', fontWeight: '500' }}>
                       Tenant: <strong>{payment.tenant_name}</strong>
                     </div>
-                    <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '2px' }}>
-                      Billing Month: {payment.month_year} • Due: {payment.due_date}
+                    <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>
+                      Billing: {payment.month_year} • Due: {payment.due_date}
                     </div>
                   </div>
 
@@ -189,12 +217,12 @@ export default function PaymentsPage({
                   alignItems: 'center',
                   marginTop: '12px',
                   paddingTop: '10px',
-                  borderTop: '0.5px solid rgba(14, 27, 60, 0.06)',
+                  borderTop: '1px solid #F1F5F9',
                   flexWrap: 'wrap',
                   gap: '8px'
                 }}>
                   {payment.status === 'Paid' ? (
-                    <div style={{ fontSize: '11.5px', color: '#64748b' }}>
+                    <div style={{ fontSize: '11.5px', color: '#166534', fontWeight: '500' }}>
                       Paid on: <strong>{payment.paid_date}</strong> via {payment.payment_method || 'Cash'}
                     </div>
                   ) : payment.status === 'Partial' ? (
@@ -202,38 +230,21 @@ export default function PaymentsPage({
                       Paid: PKR {Number(payment.paid_amount || 0).toLocaleString()} • Due: PKR {Number(payment.balance_due !== undefined ? payment.balance_due : (payment.amount - (payment.paid_amount || 0))).toLocaleString()}
                     </div>
                   ) : (
-                    <div style={{ fontSize: '11.5px', color: 'var(--color-amber)', fontWeight: '600' }}>
+                    <div style={{ fontSize: '11.5px', color: '#DC2626', fontWeight: '600' }}>
                       Rent collection pending
                     </div>
                   )}
 
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     {payment.status === 'Paid' ? (
-                      <>
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => onOpenReceipt(payment.id)}
-                        >
-                          <Printer size={13} />
-                          <span>Receipt</span>
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-navy btn-sm"
-                          onClick={() => {
-                            try {
-                              downloadReceiptPdf(payment, 'Rent_Receipt');
-                            } catch (e) {
-                              alert('Error generating PDF: ' + (e.message || e));
-                            }
-                          }}
-                          title="Download Official PDF Receipt"
-                        >
-                          <Download size={13} />
-                          <span>PDF</span>
-                        </button>
-                      </>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => onOpenReceipt(payment.id)}
+                      >
+                        <Printer size={13} />
+                        <span>Receipt</span>
+                      </button>
                     ) : payment.status === 'Partial' ? (
                       <>
                         <button
@@ -253,21 +264,6 @@ export default function PaymentsPage({
                           <Edit3 size={13} />
                           <span>Update</span>
                         </button>
-                        <button
-                          type="button"
-                          className="btn btn-navy btn-sm"
-                          onClick={() => {
-                            try {
-                              downloadReceiptPdf(payment, 'Rent_Receipt');
-                            } catch (e) {
-                              alert('Error generating PDF: ' + (e.message || e));
-                            }
-                          }}
-                          title="Download Partial PDF Receipt"
-                        >
-                          <Download size={13} />
-                          <span>PDF</span>
-                        </button>
                       </>
                     ) : (
                       <>
@@ -277,31 +273,16 @@ export default function PaymentsPage({
                           onClick={() => onMarkPaid(payment.id)}
                         >
                           <CheckCircle2 size={13} />
-                          <span>Full Paid</span>
+                          <span>Mark Paid</span>
                         </button>
                         <button
                           type="button"
                           className="btn btn-secondary btn-sm"
                           onClick={() => setSelectedPaymentForUpdate(payment)}
-                          style={{ borderColor: 'var(--color-amber-border)', color: '#B45309' }}
+                          style={{ borderColor: '#E2E8F0', color: 'var(--color-navy)' }}
                         >
                           <Edit3 size={13} />
                           <span>Update</span>
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => {
-                            try {
-                              downloadReceiptPdf(payment, 'Rent_Bill');
-                            } catch (e) {
-                              alert('Error generating PDF: ' + (e.message || e));
-                            }
-                          }}
-                          title="Download Rent Bill / Invoice"
-                        >
-                          <Download size={13} />
-                          <span>Bill</span>
                         </button>
                       </>
                     )}
