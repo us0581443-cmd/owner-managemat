@@ -159,7 +159,7 @@ export default function Header() {
         <Link
           href="/check-in"
           className="btn-topbar-action btn-topbar-mint"
-          title="Check-in a new tenant with 6-section bio-data (Flow B)"
+          title="Check-in and register a new tenant"
         >
           <UserPlus size={14} />
           <span>Check-in</span>
@@ -169,7 +169,7 @@ export default function Header() {
         <Link
           href="/flats/add"
           className="btn-topbar-action btn-topbar-primary"
-          title="Add a new flat or penthouse to portfolio (Flow A)"
+          title="Add a new flat to property portfolio"
         >
           <Plus size={14} />
           <span>Add Flat</span>

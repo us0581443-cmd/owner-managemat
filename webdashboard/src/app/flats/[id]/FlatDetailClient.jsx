@@ -144,11 +144,11 @@ export default function FlatDetailClient({ params }) {
         onClose={() => setIsReceiptOpen(false)}
       />
 
-      {/* Checkout Modal (Flow D) */}
+      {/* Checkout Modal */}
       <ConfirmModal
         isOpen={showCheckoutModal}
-        title="Confirm Tenant Checkout (Flow D)"
-        message={`Are you sure you want to check out ${flat.tenant_name || 'the tenant'} from ${flat.flat_number}? Their tenancy record will be preserved in the Customer CRM Directory (Flow E) and this flat will immediately become Vacant.`}
+        title="Confirm Tenant Checkout"
+        message={`Are you sure you want to check out ${flat.tenant_name || 'the tenant'} from ${flat.flat_number}? Their tenancy record will be preserved in the Customer Directory and this flat will immediately become Vacant.`}
         confirmText="Confirm Checkout"
         confirmVariant="coral"
         onConfirm={handleCheckoutConfirm}
@@ -492,7 +492,7 @@ export default function FlatDetailClient({ params }) {
                   onClick={() => setShowBioModal(true)}
                 >
                   <FileText size={15} />
-                  <span>View Complete 6-Section Bio-Data</span>
+                  <span>View Tenant Bio-Data</span>
                 </button>
 
                 <button
@@ -502,7 +502,7 @@ export default function FlatDetailClient({ params }) {
                   onClick={() => setShowCheckoutModal(true)}
                 >
                   <LogOut size={15} />
-                  <span>Checkout Tenant (Flow D)</span>
+                  <span>Checkout Tenant</span>
                 </button>
               </div>
             </div>
@@ -736,7 +736,7 @@ export default function FlatDetailClient({ params }) {
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
             <div className="modal-header">
               <h3 style={{ fontSize: '16.5px', fontWeight: '700', color: 'var(--color-navy)' }}>
-                Complete Tenant Bio-Data (6 Sections)
+                Complete Tenant Bio-Data
               </h3>
               <button
                 type="button"

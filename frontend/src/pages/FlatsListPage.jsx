@@ -59,7 +59,7 @@ export default function FlatsListPage({
         />
       </div>
 
-      {/* Sorting Bar (Section 2.2: Date Added, Rent High-Low, Name A-Z, Status) */}
+      {/* Sorting Filter Tabs */}
       <div style={{
         display: 'flex',
         gap: '6px',

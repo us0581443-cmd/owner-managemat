@@ -17,6 +17,7 @@ export default function AddFlatPage({ onBack, onFlatAdded, showToast }) {
     bedrooms: '2 Bed',
     size: '',
     monthly_rent: '',
+    daily_rate: '',
   });
   const [selectedPhoto, setSelectedPhoto] = useState(PRESET_PHOTOS[0]);
   const [customPhotoUrl, setCustomPhotoUrl] = useState('');
@@ -58,7 +59,7 @@ export default function AddFlatPage({ onBack, onFlatAdded, showToast }) {
             Add New Flat
           </h2>
           <div style={{ fontSize: '12px', color: '#64748B' }}>
-            Flow A: Register property to start managing records
+            Register property to start managing records
           </div>
         </div>
       </div>
@@ -120,16 +121,38 @@ export default function AddFlatPage({ onBack, onFlatAdded, showToast }) {
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Monthly Rent (PKR) *</label>
-            <input
-              type="number"
-              className="form-input"
-              placeholder="e.g. 75000"
-              value={formData.monthly_rent}
-              onChange={(e) => setFormData({ ...formData, monthly_rent: e.target.value })}
-              required
-            />
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Monthly Rent (PKR) *</label>
+              <input
+                type="number"
+                className="form-input"
+                placeholder="e.g. 75000"
+                value={formData.monthly_rent}
+                onChange={(e) => {
+                  const rent = e.target.value;
+                  const calculatedDaily = rent ? Math.round(Number(rent) / 30) : '';
+                  setFormData(prev => ({
+                    ...prev,
+                    monthly_rent: rent,
+                    daily_rate: (!prev.daily_rate || prev.daily_rate === Math.round(Number(prev.monthly_rent || 0) / 30).toString()) ? calculatedDaily.toString() : prev.daily_rate
+                  }));
+                }}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Daily Rate (PKR) *</label>
+              <input
+                type="number"
+                className="form-input"
+                placeholder="e.g. 2500"
+                value={formData.daily_rate}
+                onChange={(e) => setFormData({ ...formData, daily_rate: e.target.value })}
+                required
+              />
+            </div>
           </div>
 
           {/* Photo Selector */}

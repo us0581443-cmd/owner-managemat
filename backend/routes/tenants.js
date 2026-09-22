@@ -40,7 +40,7 @@ router.get('/check-cnic/:cnic', (req, res) => {
   }
 });
 
-// POST /api/tenants/check-in - Flow B: Tenant Check-in and Booking
+// POST /api/tenants/check-in - Tenant Check-in and Booking
 router.post('/check-in', (req, res) => {
   try {
     const ownerId = req.ownerId || 1;
@@ -352,7 +352,7 @@ router.post('/check-in', (req, res) => {
   }
 });
 
-// POST /api/tenants/checkout/:flat_id - Flow D: Checkout Tenant
+// POST /api/tenants/checkout/:flat_id - Checkout Tenant
 router.post('/checkout/:flat_id', (req, res) => {
   try {
     const ownerId = req.ownerId || 1;

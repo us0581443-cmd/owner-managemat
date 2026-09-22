@@ -255,7 +255,7 @@ export default function FlatDetailPage({
               onClick={() => onCheckoutClick(flat)}
             >
               <LogOut size={16} />
-              <span>Checkout Tenant (Flow D)</span>
+              <span>Checkout Tenant</span>
             </button>
           </div>
         </div>
@@ -517,7 +517,7 @@ export default function FlatDetailPage({
         )}
       </div>
 
-      {/* Full Tenant Bio-Data Modal (Section 2.3) */}
+      {/* Full Tenant Bio-Data Modal */}
       {showBioModal && isBooked && (
         <div className="modal-backdrop" onClick={() => setShowBioModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

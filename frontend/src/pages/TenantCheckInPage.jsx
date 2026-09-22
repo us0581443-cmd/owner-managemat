@@ -148,7 +148,7 @@ export default function TenantCheckInPage({ flat, onBack, onCheckInComplete, sho
         </div>
       </div>
 
-      {/* Real-time Customer Recognition Alert (Section 2.5) */}
+      {/* Customer Recognition Alert */}
       {cnicStatus && (
         <div style={{
           background: cnicStatus.exists ? 'var(--color-amber-light)' : 'var(--color-blue-light)',
@@ -172,21 +172,20 @@ export default function TenantCheckInPage({ flat, onBack, onCheckInComplete, sho
             ) : (
               <>
                 <strong style={{ color: 'var(--color-blue)' }}>New Customer Verified</strong>
-                <div style={{ color: '#334155' }}>First time staying with you. A permanent bio-data record will be established.</div>
+                <div style={{ color: '#334155' }}>First time staying with you. A permanent record will be established.</div>
               </>
             )}
           </div>
         </div>
       )}
 
-      {/* Bio-Data Form (6 Sections) */}
+      {/* Tenant Registration Form */}
       <form onSubmit={handleSubmit}>
         <div style={{ background: '#ffffff', border: '0.5px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '18px', marginBottom: '16px' }}>
           
-          {/* SECTION 1: Personal Details */}
           <div className="form-section-header">
             <span className="form-section-badge">1</span>
-            <h3 style={{ fontSize: '14px', fontWeight: '700' }}>Personal Details (Identity)</h3>
+            <h3 style={{ fontSize: '14px', fontWeight: '700' }}>Personal Details</h3>
           </div>
 
           <div className="form-group">

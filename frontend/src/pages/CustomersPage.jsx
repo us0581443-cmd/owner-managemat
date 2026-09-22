@@ -126,7 +126,7 @@ export default function CustomersPage({
                 </div>
               </div>
 
-              {/* Flow E: Below each customer's card, their complete history is visible — which flat, from when to when */}
+              {/* Below each customer's card, their complete history is visible — which flat, from when to when */}
               <div style={{ borderTop: '0.5px dashed rgba(14, 27, 60, 0.12)', paddingTop: '10px' }}>
                 <div style={{
                   display: 'flex',

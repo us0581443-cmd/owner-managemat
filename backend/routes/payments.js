@@ -45,7 +45,7 @@ router.get('/', (req, res) => {
   }
 });
 
-// POST /api/payments/:id/update-status - Flow C+: Live Update Payment Status / Record Payment
+// POST /api/payments/:id/update-status - Update Payment Status / Record Payment
 router.post('/:id/update-status', (req, res) => {
   try {
     const ownerId = req.ownerId || 1;
@@ -157,7 +157,7 @@ router.post('/:id/update-status', (req, res) => {
   }
 });
 
-// POST /api/payments/:id/mark-paid - Flow C: One-tap Mark Rent as Paid
+// POST /api/payments/:id/mark-paid - Mark Rent as Paid
 router.post('/:id/mark-paid', (req, res) => {
   try {
     const ownerId = req.ownerId || 1;

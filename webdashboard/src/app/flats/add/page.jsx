@@ -68,7 +68,7 @@ export default function AddFlatPage() {
         </Link>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--color-navy)', letterSpacing: '-0.5px' }}>
-            Add New Property (Flow A)
+            Add New Property
           </h1>
           <p style={{ fontSize: '13px', color: '#64748B' }}>
             Register a new rental unit in your shared portfolio • Immediate sync with mobile app

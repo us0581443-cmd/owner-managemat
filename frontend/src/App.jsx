@@ -278,7 +278,7 @@ export default function App() {
     setCurrentView('tenant-checkin');
   };
 
-  // Tenant Check-in Execution (Flow B)
+  // Tenant Check-in Execution
   const handleCheckInComplete = async (formData) => {
     const res = await api.checkInTenant(formData);
     showToast(res.message, 'success');
@@ -289,7 +289,7 @@ export default function App() {
     handleOpenFlat(formData.flat_id);
   };
 
-  // Tenant Checkout Confirmation & Execution (Flow D)
+  // Tenant Checkout Confirmation & Execution
   const handleCheckoutClick = (flat) => {
     setConfirmModal({
       isOpen: true,
@@ -313,7 +313,7 @@ export default function App() {
     });
   };
 
-  // Mark Rent Paid (Flow C: One-tap action)
+  // Mark Rent Paid
   const handleMarkPaid = async (paymentId, method = 'Bank Transfer') => {
     try {
       const res = await api.markPaymentPaid(paymentId, method);
@@ -337,7 +337,7 @@ export default function App() {
     }
   };
 
-  // Update Payment Status & Amount (Flow C+: Live Sync Everywhere)
+  // Update Payment Status & Amount
   const handleUpdatePaymentStatus = async (paymentId, payload) => {
     try {
       const res = await api.updatePaymentStatus(paymentId, payload);
@@ -513,7 +513,7 @@ export default function App() {
             />
           )}
 
-          {/* 6. Tenant Check-in & Registration (Flow B) */}
+          {/* Tenant Check-in & Registration */}
           {currentView === 'tenant-checkin' && checkInFlat && (
             <TenantCheckInPage
               flat={checkInFlat}
@@ -537,7 +537,7 @@ export default function App() {
             />
           )}
 
-          {/* 8. Customers Directory Page (Flow E) */}
+          {/* Customers Directory Page */}
           {currentView === 'customers' && (
             <CustomersPage
               customers={customers}
@@ -585,7 +585,7 @@ export default function App() {
           }}
         />
 
-        {/* Toast Feedback (Section 05) */}
+        {/* Toast Feedback */}
         <Toast
           message={toast.message}
           type={toast.type}

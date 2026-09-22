@@ -253,10 +253,10 @@ function CheckInFormContent() {
         </Link>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--color-navy)', letterSpacing: '-0.5px' }}>
-            Tenant Registration & Check-in (Flow B)
+            Tenant Registration & Check-in
           </h1>
           <p style={{ fontSize: '13px', color: '#64748B' }}>
-            Comprehensive 6-section bio-data registration with instant CNIC recognition & 2-way database synchronization
+            Comprehensive tenant registration with instant CNIC recognition & live database synchronization
           </p>
         </div>
       </div>
@@ -272,7 +272,7 @@ function CheckInFormContent() {
           alignItems: 'start'
         }}>
           {/* ================================================================
-              LEFT COLUMN: 6-SECTION COMPREHENSIVE FORM CARDS
+              LEFT COLUMN: TENANT REGISTRATION CARDS
               ================================================================ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {/* Section 1: Property Assignment */}

@@ -130,7 +130,7 @@ export default function OwnerProfileModal({ isOpen, owner, onClose, onProfileUpd
       <div
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: '520px', borderRadius: '16px' }}
+        style={{ maxWidth: '520px', borderRadius: 'var(--radius-lg)' }}
       >
         {/* Modal Header */}
         <div className="modal-header" style={{ padding: '18px 22px' }}>
@@ -138,7 +138,7 @@ export default function OwnerProfileModal({ isOpen, owner, onClose, onProfileUpd
             <div style={{
               width: '36px',
               height: '36px',
-              borderRadius: '10px',
+              borderRadius: 'var(--radius-sm)',
               background: 'var(--color-blue-light)',
               display: 'flex',
               alignItems: 'center',
@@ -209,7 +209,7 @@ export default function OwnerProfileModal({ isOpen, owner, onClose, onProfileUpd
             gap: '18px',
             background: 'var(--color-ice-subtle)',
             padding: '16px',
-            borderRadius: '12px',
+            borderRadius: 'var(--radius-md)',
             marginBottom: '18px',
             border: '0.5px solid rgba(14, 27, 60, 0.08)'
           }}>
@@ -220,7 +220,7 @@ export default function OwnerProfileModal({ isOpen, owner, onClose, onProfileUpd
                 borderRadius: '50%',
                 background: formData.profile_image ? '#ffffff' : 'var(--color-blue)',
                 border: '3px solid #ffffff',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                boxShadow: 'var(--shadow-sm)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

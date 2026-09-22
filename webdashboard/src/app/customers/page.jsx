@@ -101,7 +101,7 @@ export default function CustomersPage() {
           Customer Directory & Tenant CRM
         </h1>
         <p style={{ fontSize: '13px', color: '#64748B', marginTop: '2px' }}>
-          Permanent guest directory, historical stay records across all properties & repeat guest loyalty recognition (Flow E)
+          Permanent guest directory, historical stay records across all properties & repeat guest loyalty recognition
         </p>
       </div>
 
