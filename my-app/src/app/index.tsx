@@ -6,7 +6,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
 export default function HomeScreen() {
-  const appUrl = 'https://technological-feels-stopping-salaries.trycloudflare.com';
+  const appUrl = 'https://owner-managemat.onrender.com';
   const [downloading, setDownloading] = useState(false);
 
   const handleMessage = async (event: WebViewMessageEvent) => {
@@ -69,7 +69,7 @@ export default function HomeScreen() {
           <View style={styles.errorContainer}>
             <Text style={styles.errorTitle}>Cannot Connect to NEST Server</Text>
             <Text style={styles.errorSubtitle}>
-              Please verify that your phone is on the same Wi-Fi network as this PC ({appUrl}).
+              Unable to reach server. Please check your internet connection.
             </Text>
             <Text style={{ color: '#64748B', fontSize: 12, marginTop: 10 }}>{errorDesc}</Text>
           </View>
