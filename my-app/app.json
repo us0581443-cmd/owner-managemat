@@ -2,6 +2,7 @@
   "expo": {
     "name": "my-app",
     "slug": "my-app",
+    "owner": "appsaloon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,7 +44,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "1ee403f1-6e5d-41f9-b295-7427e347281c"
+        "projectId": "4c6492ff-a7e1-4865-8536-900e772a76c1"
       }
     }
   }
