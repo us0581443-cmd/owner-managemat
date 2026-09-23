@@ -47,8 +47,10 @@ const fs = require('fs');
 const frontendDist = path.join(__dirname, '../frontend/dist');
 const webdashboardOut = path.join(__dirname, '../webdashboard/out');
 
-// 1. Mobile App endpoints
+// 1. Mobile App endpoints and assets
 if (fs.existsSync(frontendDist)) {
+  app.use('/assets', express.static(path.join(frontendDist, 'assets')));
+  app.use('/app/assets', express.static(path.join(frontendDist, 'assets')));
   app.use('/app', express.static(frontendDist));
   app.use('/mobile', express.static(frontendDist));
   app.get(['/app', '/app/*', '/mobile', '/mobile/*'], (req, res) => {
