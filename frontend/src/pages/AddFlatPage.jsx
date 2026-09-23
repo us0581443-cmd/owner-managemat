@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Building2, UploadCloud, Check, Image as ImageIcon } from 'lucide-react';
+import { LOCAL_IMAGES, getSafeImageUrl, handleImageError } from '../utils/imageHelper';
 
-const PRESET_PHOTOS = [
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80'
-];
+const PRESET_PHOTOS = LOCAL_IMAGES;
 
 export default function AddFlatPage({ onBack, onFlatAdded, showToast }) {
   const [formData, setFormData] = useState({
@@ -172,7 +166,12 @@ export default function AddFlatPage({ onBack, onFlatAdded, showToast }) {
                     border: selectedPhoto === url ? '1.5px solid var(--color-blue)' : '0.5px solid var(--color-border)'
                   }}
                 >
-                  <img src={url} alt="Flat preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img
+                    src={getSafeImageUrl(url)}
+                    alt="Flat preview"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => handleImageError(e, idx)}
+                  />
                   {selectedPhoto === url && (
                     <div style={{
                       position: 'absolute',

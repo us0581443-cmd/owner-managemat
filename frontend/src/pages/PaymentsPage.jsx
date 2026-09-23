@@ -160,24 +160,8 @@ export default function PaymentsPage({
                   boxShadow: 'var(--shadow-xs)'
                 }}
               >
-                {/* Elegant Corner PDF Icon Button */}
-                <button
-                  type="button"
-                  className="corner-pdf-btn"
-                  onClick={() => {
-                    try {
-                      downloadReceiptPdf(payment, payment.status === 'Paid' ? 'Rent_Receipt' : 'Rent_Invoice');
-                    } catch (e) {
-                      alert('Error generating PDF: ' + (e.message || e));
-                    }
-                  }}
-                  title="Download PDF"
-                >
-                  <Download size={13} />
-                </button>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: '36px' }}>
-                  <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1, paddingRight: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <strong style={{ fontSize: '15px', color: 'var(--color-navy)' }}>
                         {payment.flat_number}
@@ -200,13 +184,31 @@ export default function PaymentsPage({
                     </div>
                   </div>
 
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '16px', fontWeight: '800', fontFamily: 'var(--font-heading)', color: 'var(--color-navy)' }}>
-                      PKR {Number(payment.amount).toLocaleString()}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '800', fontFamily: 'var(--font-heading)', color: 'var(--color-navy)' }}>
+                        PKR {Number(payment.amount).toLocaleString()}
+                      </div>
+                      <div style={{ marginTop: '4px' }}>
+                        <StatusBadge status={payment.status} size="sm" />
+                      </div>
                     </div>
-                    <div style={{ marginTop: '4px' }}>
-                      <StatusBadge status={payment.status} size="sm" />
-                    </div>
+
+                    {/* Download PDF button shifted to the right corner */}
+                    <button
+                      type="button"
+                      className="corner-pdf-btn"
+                      onClick={() => {
+                        try {
+                          downloadReceiptPdf(payment, payment.status === 'Paid' ? 'Rent_Receipt' : 'Rent_Invoice');
+                        } catch (e) {
+                          alert('Error generating PDF: ' + (e.message || e));
+                        }
+                      }}
+                      title="Download PDF"
+                    >
+                      <Download size={14} />
+                    </button>
                   </div>
                 </div>
 

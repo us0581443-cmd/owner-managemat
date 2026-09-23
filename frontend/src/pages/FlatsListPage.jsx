@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Search, Trash2, ArrowUpDown, Clock, DollarSign, ArrowDownAZ, CheckCircle } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
+import { getSafeImageUrl, handleImageError } from '../utils/imageHelper';
 
 export default function FlatsListPage({
   flats,
@@ -127,7 +128,7 @@ export default function FlatsListPage({
           } catch (e) {
             photos = [];
           }
-          const thumb = photos[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80';
+          const thumb = getSafeImageUrl(photos[0]);
 
           return (
             <div
@@ -136,7 +137,12 @@ export default function FlatsListPage({
               onClick={() => onOpenFlat(flat.id)}
             >
               <div className="flat-card-img-row">
-                <img src={thumb} alt={flat.flat_number} className="flat-thumbnail" />
+                <img
+                  src={thumb}
+                  alt={flat.flat_number}
+                  className="flat-thumbnail"
+                  onError={(e) => handleImageError(e)}
+                />
                 <div className="flat-card-info">
                   <div className="flat-card-title-row">
                     <span className="flat-number-title">{flat.flat_number}</span>

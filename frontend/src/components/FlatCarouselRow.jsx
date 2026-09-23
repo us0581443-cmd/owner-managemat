@@ -9,6 +9,7 @@ import {
   Sparkles,
   CheckCircle2
 } from 'lucide-react';
+import { getSafeImageUrl, handleImageError } from '../utils/imageHelper';
 
 export default function FlatCarouselRow({
   title,
@@ -46,7 +47,7 @@ export default function FlatCarouselRow({
           } catch (e) {
             photos = [];
           }
-          const thumb = photos[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80';
+          const thumb = getSafeImageUrl(photos[0]);
           const timesRented = flat.times_rented || 0;
           const statusLower = (flat.status || '').toLowerCase();
           const isRented = statusLower === 'booked' || statusLower === 'occupied' || Boolean(flat.tenant_name);
@@ -59,7 +60,12 @@ export default function FlatCarouselRow({
             >
               {/* Media Thumbnail with Floating Glassmorphic Badges */}
               <div className="horizontal-card-media">
-                <img src={thumb} alt={flat.flat_number} loading="lazy" />
+                <img
+                  src={thumb}
+                  alt={flat.flat_number}
+                  loading="lazy"
+                  onError={(e) => handleImageError(e)}
+                />
                 <div className="card-gradient-overlay" />
 
                 {/* Professional Glassmorphism Status Badge (Rented vs Vacant) */}

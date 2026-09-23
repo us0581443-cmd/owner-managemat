@@ -234,17 +234,18 @@ export default function CustomersPage({
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
-                    background: 'var(--color-blue)',
-                    color: '#ffffff',
-                    border: 'none',
+                    background: 'transparent',
+                    color: '#2563EB',
+                    border: '1px solid #93C5FD',
                     borderRadius: '8px',
                     fontSize: '12.5px',
-                    fontWeight: '700',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    boxShadow: '0 1px 2px rgba(30, 58, 138, 0.18)'
+                    boxShadow: 'none',
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  <Eye size={14} />
+                  <Eye size={14} color="#2563EB" />
                   <span>View Details</span>
                 </button>
 

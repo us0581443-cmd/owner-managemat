@@ -6,7 +6,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
 export default function HomeScreen() {
-  const appUrl = 'http://192.168.1.37:3000';
+  const appUrl = 'https://technological-feels-stopping-salaries.trycloudflare.com';
   const [downloading, setDownloading] = useState(false);
 
   const handleMessage = async (event: WebViewMessageEvent) => {
@@ -56,6 +56,8 @@ export default function HomeScreen() {
         allowFileAccess={true}
         allowFileAccessFromFileURLs={true}
         originWhitelist={['*']}
+        mixedContentMode="always"
+        androidLayerType="hardware"
         onMessage={handleMessage}
         renderLoading={() => (
           <View style={styles.loadingContainer}>

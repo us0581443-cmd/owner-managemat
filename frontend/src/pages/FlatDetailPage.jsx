@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Edit, Trash2, UserPlus, LogOut, CheckCircle, FileText, Phone, Mail, MapPin, Calendar, Clock, DollarSign, ShieldAlert, CreditCard } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
+import { getSafeImageUrl, handleImageError } from '../utils/imageHelper';
 
 export default function FlatDetailPage({
   flat,
@@ -34,7 +35,7 @@ export default function FlatDetailPage({
   } catch (e) {
     photos = [];
   }
-  const mainPhoto = photos[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80';
+  const mainPhoto = getSafeImageUrl(photos[0]);
 
   const isBooked = flat.status === 'Booked';
   const activeTenancy = flat.activeTenancy;
@@ -86,6 +87,7 @@ export default function FlatDetailPage({
           src={mainPhoto}
           alt={flat.flat_number}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          onError={(e) => handleImageError(e)}
         />
         <div style={{
           position: 'absolute',

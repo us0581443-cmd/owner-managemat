@@ -82,7 +82,7 @@ export default function DashboardPage({ stats, onNavigate, onOpenFlat, onMarkPai
           onClick={() => onNavigate('add-flat')}
         >
           <div className="quick-action-icon add-flat">
-            <Plus size={19} strokeWidth={1.35} />
+            <Plus size={22} strokeWidth={1.8} />
           </div>
           <span className="quick-action-label">Add Flat</span>
         </button>
@@ -93,7 +93,7 @@ export default function DashboardPage({ stats, onNavigate, onOpenFlat, onMarkPai
           onClick={() => onNavigate('payments')}
         >
           <div className="quick-action-icon collect-rent">
-            <Wallet size={19} strokeWidth={1.35} />
+            <Wallet size={22} strokeWidth={1.8} />
           </div>
           <span className="quick-action-label">Collect Rent</span>
         </button>
@@ -104,7 +104,7 @@ export default function DashboardPage({ stats, onNavigate, onOpenFlat, onMarkPai
           onClick={() => onNavigate('flats')}
         >
           <div className="quick-action-icon checkin">
-            <UserPlus size={19} strokeWidth={1.35} />
+            <UserPlus size={22} strokeWidth={1.8} />
           </div>
           <span className="quick-action-label">Check-in</span>
         </button>
@@ -115,7 +115,7 @@ export default function DashboardPage({ stats, onNavigate, onOpenFlat, onMarkPai
           onClick={() => onNavigate('payments')}
         >
           <div className="quick-action-icon expense">
-            <Wrench size={19} strokeWidth={1.35} />
+            <Wrench size={22} strokeWidth={1.8} />
           </div>
           <span className="quick-action-label">Expense</span>
         </button>
