@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
-    "owner": "appsaloon",
+    "name": "owner-management",
+    "slug": "owner-management",
+    "owner": "mubeena007s-team",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -44,7 +44,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4c6492ff-a7e1-4865-8536-900e772a76c1"
+        "projectId": "ae88a446-f1cf-44b6-8f46-6563dfdd5072"
       }
     }
   }
