@@ -6,7 +6,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
 export default function HomeScreen() {
-  const appUrl = 'https://owner-managemat.onrender.com';
+  const appUrl = 'https://owner-managemat.onrender.com/app';
   const [downloading, setDownloading] = useState(false);
 
   const handleMessage = async (event: WebViewMessageEvent) => {

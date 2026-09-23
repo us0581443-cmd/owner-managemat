@@ -42,11 +42,39 @@ app.use('/api/payments', requireAuth, paymentsRouter);
 app.use('/api/expenses', requireAuth, expensesRouter);
 app.use('/api/customers', requireAuth, customersRouter);
 
-// Serve Frontend Static Build (if available)
+// Serve Web Dashboard (Desktop Website) and Mobile App (Frontend)
 const fs = require('fs');
 const frontendDist = path.join(__dirname, '../frontend/dist');
+const webdashboardOut = path.join(__dirname, '../webdashboard/out');
 
+// 1. Mobile App endpoints
 if (fs.existsSync(frontendDist)) {
+  app.use('/app', express.static(frontendDist));
+  app.use('/mobile', express.static(frontendDist));
+  app.get(['/app', '/app/*', '/mobile', '/mobile/*'], (req, res) => {
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
+
+// 2. Executive Web Dashboard (Desktop Website) at root
+if (fs.existsSync(webdashboardOut)) {
+  app.use(express.static(webdashboardOut));
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api/') || req.url.startsWith('/images/')) {
+      return next();
+    }
+    const cleanPath = req.path.replace(/\/+$/, '') || '/index';
+    const candidateHtml = path.join(webdashboardOut, `${cleanPath}.html`);
+    if (fs.existsSync(candidateHtml)) {
+      return res.sendFile(candidateHtml);
+    }
+    const nestedIndex = path.join(webdashboardOut, cleanPath, 'index.html');
+    if (fs.existsSync(nestedIndex)) {
+      return res.sendFile(nestedIndex);
+    }
+    res.sendFile(path.join(webdashboardOut, 'index.html'));
+  });
+} else if (fs.existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
   app.get('*', (req, res, next) => {
     if (req.url.startsWith('/api/') || req.url.startsWith('/images/')) {

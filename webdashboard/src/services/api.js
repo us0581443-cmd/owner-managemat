@@ -1,12 +1,15 @@
 // NEST Web Dashboard API Service Layer
 // Connects directly to the backend for ultra-fast response times (< 5ms)
 
-export const DEFAULT_REMOTE_API = 'https://smart-trams-give.loca.lt/api';
+export const DEFAULT_REMOTE_API = 'https://owner-managemat.onrender.com/api';
 
 export const getApiBase = () => {
   if (typeof window !== 'undefined') {
+    if (window.location.hostname.includes('onrender.com')) {
+      return `${window.location.origin}/api`;
+    }
     const host = window.location.hostname || '127.0.0.1';
-    // If on localhost OR on local Wi-Fi (192.168.x.x, 10.x.x.x, 172.x.x.x): connect directly (< 5ms, 100% reliable)
+    // If on localhost OR on local Wi-Fi: connect directly
     if (host === 'localhost' || host === '127.0.0.1' || /^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host)) {
       return `http://${host}:5000/api`;
     }
