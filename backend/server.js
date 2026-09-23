@@ -42,6 +42,20 @@ app.use('/api/payments', requireAuth, paymentsRouter);
 app.use('/api/expenses', requireAuth, expensesRouter);
 app.use('/api/customers', requireAuth, customersRouter);
 
+// Serve Frontend Static Build (if available)
+const fs = require('fs');
+const frontendDist = path.join(__dirname, '../frontend/dist');
+
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api/') || req.url.startsWith('/images/')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
+
 // Error Handler
 app.use((err, req, res, next) => {
   console.error('Server error:', err);

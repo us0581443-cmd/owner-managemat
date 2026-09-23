@@ -1,0 +1,14 @@
+{
+  "name": "owner-management-unified",
+  "version": "1.0.0",
+  "description": "Owner Management full-stack application",
+  "main": "backend/server.js",
+  "scripts": {
+    "render-build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "cd backend && node server.js",
+    "build": "cd frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

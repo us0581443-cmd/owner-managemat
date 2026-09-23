@@ -13,6 +13,7 @@ dist/
 # Large binaries & tools
 cloudflared.exe
 *.exe
+*.apk
 
 # SQLite WAL & temporary files
 *.sqlite-shm

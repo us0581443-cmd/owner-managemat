@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: owner-management
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm run render-build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: GMAIL_USER
+        value: us0581443@gmail.com
+      - key: GMAIL_APP_PASSWORD
+        value: lmumsazlmrdwcccx
