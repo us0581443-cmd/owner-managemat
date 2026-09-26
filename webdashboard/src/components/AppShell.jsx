@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
+import BottomNav from '@/components/BottomNav';
 import { api, getAuthToken, setAuthToken, setAuthOwner, getAuthOwner } from '@/services/api';
 import { Building2, RefreshCw } from 'lucide-react';
 
@@ -11,6 +12,7 @@ export default function AppShell({ children }) {
   const pathname = usePathname();
   const router = useRouter();
   const initialCheckDone = useRef(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Initialize directly from localStorage to eliminate any splash screen delay
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -75,6 +77,11 @@ export default function AppShell({ children }) {
     }
   }, [pathname, router]);
 
+  // Close mobile drawer whenever route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   // If on /login, show login card only
   if (pathname === '/login') {
     return <>{children}</>;
@@ -116,13 +123,14 @@ export default function AppShell({ children }) {
   // Authenticated user on protected route: Render full desktop shell with Sidebar & Header
   return (
     <div className="web-shell">
-      <Sidebar />
+      <Sidebar mobileOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
       <div className="web-main">
-        <Header />
+        <Header onToggleMobileMenu={() => setMobileMenuOpen(prev => !prev)} />
         <main className="web-content-container">
           {children}
         </main>
       </div>
+      <BottomNav />
     </div>
   );
 }

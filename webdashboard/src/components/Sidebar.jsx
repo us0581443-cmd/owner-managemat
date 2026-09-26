@@ -16,11 +16,12 @@ import {
   Database,
   ArrowUpRight,
   TrendingUp,
-  ShieldCheck
+  ShieldCheck,
+  X
 } from 'lucide-react';
 import { getAuthOwner } from '@/services/api';
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen = false, onClose }) {
   const pathname = usePathname();
   const [flatCount, setFlatCount] = useState(null);
   const [pendingCount, setPendingCount] = useState(null);
@@ -71,89 +72,108 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="desktop-sidebar">
-      {/* Brand Header */}
-      <div className="sidebar-brand-box">
-        <div className="sidebar-logo-icon">
-          N
-        </div>
-        <div>
-          <div className="sidebar-brand-name">NEST</div>
-          <div className="sidebar-brand-sub">PropTech Suite</div>
-        </div>
-      </div>
-
-      {/* Navigation Sections */}
-      <nav className="sidebar-nav">
-        {navSections.map((sec, idx) => (
-          <div key={idx}>
-            <div className="sidebar-nav-section">{sec.title}</div>
-            {sec.items.map((item) => {
-              const Icon = item.icon;
-              const isActive = item.href === '/'
-                ? pathname === '/'
-                : pathname.startsWith(item.href);
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`sidebar-link ${isActive ? 'active' : ''}`}
-                >
-                  <div className="sidebar-link-inner">
-                    <Icon size={18} strokeWidth={1.4} />
-                    <span>{item.label}</span>
-                  </div>
-
-                  {item.count !== null && item.count !== undefined && item.count > 0 && (
-                    <span
-                      className="sidebar-pill-badge"
-                      style={item.countVariant === 'coral' && !isActive ? { background: 'rgba(229, 89, 78, 0.25)', color: '#fca5a5' } : {}}
-                    >
-                      {item.count}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+    <>
+      {mobileOpen && (
+        <div
+          className="sidebar-mobile-backdrop"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`desktop-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
+        {/* Brand Header */}
+        <div className="sidebar-brand-box">
+          <div className="sidebar-logo-icon">
+            N
           </div>
-        ))}
+          <div style={{ flex: 1 }}>
+            <div className="sidebar-brand-name">NEST</div>
+            <div className="sidebar-brand-sub">PropTech Suite</div>
+          </div>
+          <button
+            type="button"
+            className="sidebar-mobile-close-btn"
+            onClick={onClose}
+            aria-label="Close navigation menu"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-        {/* Database & Sync Status Mini Card */}
-        <div style={{
-          marginTop: 'auto',
-          padding: '14px',
-          background: 'rgba(255, 255, 255, 0.04)',
-          borderRadius: '10px',
-          border: '0.5px solid rgba(255, 255, 255, 0.08)',
-          fontSize: '11px',
-          marginBottom: '8px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#93c5fd', fontWeight: '700', marginBottom: '4px' }}>
-            <Database size={13} />
-            <span>SHARED SQLITE DB</span>
-          </div>
-          <div style={{ color: '#94a3b8', lineHeight: '1.4' }}>
-            Two-way live synchronization active with Mobile App on port 5000.
-          </div>
-        </div>
-      </nav>
+        {/* Navigation Sections */}
+        <nav className="sidebar-nav">
+          {navSections.map((sec, idx) => (
+            <div key={idx}>
+              <div className="sidebar-nav-section">{sec.title}</div>
+              {sec.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = item.href === '/'
+                  ? pathname === '/'
+                  : pathname.startsWith(item.href);
 
-      {/* Footer User Info */}
-      <div className="sidebar-user-card">
-        <div className="user-avatar-circle">
-          {currentUser ? currentUser.name.slice(0, 2).toUpperCase() : 'OP'}
-        </div>
-        <div className="user-info-text">
-          <div className="user-name-line">{currentUser?.name || 'Property Owner'}</div>
-          <div className="user-role-line" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399' }} />
-            <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {currentUser?.email || 'owner@gmail.com'}
-            </span>
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => onClose && onClose()}
+                    className={`sidebar-link ${isActive ? 'active' : ''}`}
+                  >
+                    <div className="sidebar-link-inner">
+                      <Icon size={18} strokeWidth={1.4} />
+                      <span>{item.label}</span>
+                    </div>
+
+                    {item.count !== null && item.count !== undefined && item.count > 0 && (
+                      <span
+                        className="sidebar-pill-badge"
+                        style={item.countVariant === 'coral' && !isActive ? { background: 'rgba(229, 89, 78, 0.25)', color: '#fca5a5' } : {}}
+                      >
+                        {item.count}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+
+          {/* Database & Sync Status Mini Card */}
+          <div style={{
+            marginTop: 'auto',
+            padding: '14px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            borderRadius: '10px',
+            border: '0.5px solid rgba(255, 255, 255, 0.08)',
+            fontSize: '11px',
+            marginBottom: '8px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#93c5fd', fontWeight: '700', marginBottom: '4px' }}>
+              <Database size={13} />
+              <span>SHARED SQLITE DB</span>
+            </div>
+            <div style={{ color: '#94a3b8', lineHeight: '1.4' }}>
+              Two-way live synchronization active with Mobile App on port 5000.
+            </div>
+          </div>
+        </nav>
+
+        {/* Footer User Info */}
+        <div className="sidebar-user-card">
+          <div className="user-avatar-circle">
+            {currentUser ? currentUser.name.slice(0, 2).toUpperCase() : 'OP'}
+          </div>
+          <div className="user-info-text">
+            <div className="user-name-line">{currentUser?.name || 'Property Owner'}</div>
+            <div className="user-role-line" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399' }} />
+              <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {currentUser?.email || 'owner@gmail.com'}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
+

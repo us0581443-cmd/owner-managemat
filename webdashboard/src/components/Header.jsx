@@ -20,12 +20,13 @@ import {
   Command,
   LogOut,
   User,
-  Settings
+  Settings,
+  Menu
 } from 'lucide-react';
 import { api, getAuthOwner, setAuthOwner } from '@/services/api';
 import OwnerProfileModal from './OwnerProfileModal';
 
-export default function Header() {
+export default function Header({ onToggleMobileMenu }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchInputRef = useRef(null);
@@ -117,6 +118,17 @@ export default function Header() {
     <header className="desktop-topbar">
       {/* Left: Active Section Context & Command Search Bar */}
       <div className="topbar-left">
+        {/* Mobile Hamburger Drawer Button */}
+        <button
+          type="button"
+          className="topbar-hamburger-btn"
+          onClick={onToggleMobileMenu}
+          aria-label="Toggle navigation menu"
+          title="Open navigation menu"
+        >
+          <Menu size={18} />
+        </button>
+
         {/* Dynamic Context Pill */}
         <div className="topbar-context-pill">
           <SectionIcon size={14} color="var(--color-blue)" />
@@ -151,7 +163,7 @@ export default function Header() {
           title="Shared SQLite Database (nest.sqlite via port 5000) • Two-way real-time sync with mobile app"
         >
           <span className="live-pulse-dot" />
-          <span style={{ fontWeight: '700', letterSpacing: '0.2px' }}>Live Sync</span>
+          <span className="sync-badge-text" style={{ fontWeight: '700', letterSpacing: '0.2px' }}>Live Sync</span>
           {timeStr && <span className="sync-time-str">• {timeStr}</span>}
         </div>
 
@@ -162,7 +174,7 @@ export default function Header() {
           title="Check-in and register a new tenant"
         >
           <UserPlus size={14} />
-          <span>Check-in</span>
+          <span className="btn-topbar-label">Check-in</span>
         </Link>
 
         {/* Quick Add Flat Button */}
@@ -172,7 +184,7 @@ export default function Header() {
           title="Add a new flat to property portfolio"
         >
           <Plus size={14} />
-          <span>Add Flat</span>
+          <span className="btn-topbar-label">Add Flat</span>
         </Link>
 
         {/* Vertical Divider */}
@@ -257,7 +269,7 @@ export default function Header() {
                 <span>{currentUser ? 'Verified Owner' : 'Admin'}</span>
               </span>
             </div>
-            <ChevronDown size={13} color="#94A3B8" />
+            <ChevronDown size={13} color="#94A3B8" className="topbar-profile-chevron" />
           </div>
 
           {showProfileMenu && (

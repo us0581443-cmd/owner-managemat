@@ -265,12 +265,7 @@ function CheckInFormContent() {
           2. TWO-COLUMN DESKTOP REGISTRATION LAYOUT (65% / 35%)
           ==================================================================== */}
       <form onSubmit={handleSubmit}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.45fr) minmax(360px, 1fr)',
-          gap: '24px',
-          alignItems: 'start'
-        }}>
+        <div className="checkin-workspace-grid">
           {/* ================================================================
               LEFT COLUMN: TENANT REGISTRATION CARDS
               ================================================================ */}
@@ -325,7 +320,7 @@ function CheckInFormContent() {
                 <span>2. Personal Details & CNIC Verification</span>
               </h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div className="form-grid-2">
                 <div>
                   <label className="form-label">CNIC Number (Auto-Recognition) *</label>
                   <div style={{ position: 'relative' }}>
@@ -518,7 +513,7 @@ function CheckInFormContent() {
                 <span>5. Emergency Contact Person</span>
               </h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              <div className="form-grid-3">
                 <div>
                   <label className="form-label">Contact Name</label>
                   <input
@@ -638,7 +633,7 @@ function CheckInFormContent() {
 
               {formData.booking_type === 'daily' ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div className="form-grid-2">
                     <div>
                       <label className="form-label">Check-in Date *</label>
                       <input
@@ -679,7 +674,7 @@ function CheckInFormContent() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div className="form-grid-2">
                     <div>
                       <label className="form-label">Stay Duration (Total Days)</label>
                       <input
@@ -833,7 +828,7 @@ function CheckInFormContent() {
               </div>
 
               {/* Status Segmented Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '16px' }}>
+              <div className="status-button-grid" style={{ marginBottom: '16px' }}>
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, payment_status: 'Paid', paid_amount: totalStayRent.toString() }))}
@@ -1020,7 +1015,7 @@ function CheckInFormContent() {
           {/* ================================================================
               RIGHT COLUMN: STICKY FLAT SUMMARY, CNIC RECOGNITION & CTA
               ================================================================ */}
-          <div style={{ position: 'sticky', top: '80px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div className="workspace-sidebar-sticky" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {/* Real-time CNIC Recognition Card */}
             {cnicStatus && (
               <div style={{

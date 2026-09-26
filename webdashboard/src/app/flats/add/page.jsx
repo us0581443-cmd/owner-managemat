@@ -91,12 +91,7 @@ export default function AddFlatPage() {
       )}
 
       {/* 2-Column Desktop View: Form on Left, Live Preview Card on Right */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1.45fr) minmax(340px, 1fr)',
-        gap: '24px',
-        alignItems: 'start'
-      }}>
+      <div className="form-preview-grid">
         {/* Left: Form */}
         <div style={{
           background: '#ffffff',
@@ -275,7 +270,7 @@ export default function AddFlatPage() {
         </div>
 
         {/* Right: Live Preview Card */}
-        <div style={{ position: 'sticky', top: '80px' }}>
+        <div className="workspace-sidebar-sticky">
           <div style={{
             background: '#ffffff',
             borderRadius: 'var(--radius-lg)',

@@ -217,12 +217,7 @@ export default function FlatDetailClient({ params }) {
       {/* ====================================================================
           2. TWO-COLUMN DESKTOP MASTER LAYOUT (60% / 40%)
           ==================================================================== */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1.35fr) minmax(360px, 1fr)',
-        gap: '24px',
-        alignItems: 'start'
-      }}>
+      <div className="detail-workspace-grid">
         {/* ==================================================================
             LEFT COLUMN: MEDIA, SPECIFICATIONS & RENT PAYMENT LEDGER
             ================================================================== */}
@@ -382,7 +377,7 @@ export default function FlatDetailClient({ params }) {
         {/* ==================================================================
             RIGHT COLUMN: STICKY TENANCY CARD OR VACANT MOVE-IN ACTION
             ================================================================== */}
-        <div style={{ position: 'sticky', top: '80px' }}>
+        <div className="workspace-sidebar-sticky">
           {isBooked ? (
             <div style={{
               background: '#ffffff',

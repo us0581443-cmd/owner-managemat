@@ -388,12 +388,7 @@ export default function HomePage() {
       {/* ====================================================================
           3. MAIN 2-COLUMN DESKTOP WORKSPACE LAYOUT
           ==================================================================== */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 340px',
-        gap: '24px',
-        alignItems: 'start'
-      }}>
+      <div className="dashboard-workspace-grid">
         {/* ==================================================================
             LEFT COLUMN (PRIMARY): PROPERTIES CATALOG & RECENT TRANSACTIONS
             ================================================================== */}
@@ -706,7 +701,7 @@ export default function HomePage() {
         {/* ==================================================================
             RIGHT COLUMN (SIDEBAR): ACTION CENTER, QUICK EXPENSE & STATS
             ================================================================== */}
-        <div>
+        <div className="workspace-sidebar-sticky">
           {/* 1. VACANT UNITS ATTENTION CARD */}
           <div style={{
             background: '#ffffff',
