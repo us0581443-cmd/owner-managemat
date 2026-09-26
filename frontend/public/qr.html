@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Download Owner Management APK</title>
+  <title>Owner Management - 24/7 Permanent Live App</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -15,107 +15,115 @@
     }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: radial-gradient(circle at top, #1E293B 0%, #0F172A 100%);
+      background: radial-gradient(circle at top, #111827 0%, #0B0F19 100%);
       color: #F8FAFC;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 30px 16px;
+      padding: 36px 16px;
       text-align: center;
     }
-    .card {
-      background: rgba(30, 41, 59, 0.8);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 28px;
-      padding: 36px 28px;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+    .header {
+      margin-bottom: 32px;
+      max-width: 650px;
     }
-    .badge-ready {
+    .badge-live-247 {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
-      background: rgba(16, 185, 129, 0.2);
+      gap: 8px;
+      padding: 8px 18px;
+      background: rgba(16, 185, 129, 0.18);
       color: #34D399;
-      border: 1px solid rgba(16, 185, 129, 0.4);
+      border: 1px solid rgba(16, 185, 129, 0.35);
       border-radius: 9999px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-    .badge-dot {
-      width: 8px;
-      height: 8px;
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: #34D399;
-      box-shadow: 0 0 10px #34D399;
+      box-shadow: 0 0 12px #34D399;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
     }
     h1 {
-      font-size: 26px;
+      font-size: 30px;
       font-weight: 800;
       color: #FFFFFF;
+      letter-spacing: -0.5px;
       margin-bottom: 8px;
     }
     p.subtitle {
       color: #94A3B8;
-      font-size: 14px;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .qr-frame {
-      background: #FFFFFF;
-      padding: 18px;
-      border-radius: 22px;
-      display: inline-block;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-      margin-bottom: 24px;
-    }
-    .qr-frame img {
-      width: 270px;
-      height: 270px;
-      display: block;
-    }
-    .instructions {
-      background: rgba(15, 23, 42, 0.65);
-      border-radius: 16px;
-      padding: 16px 20px;
-      font-size: 13px;
-      color: #CBD5E1;
-      margin-bottom: 24px;
-      text-align: left;
+      font-size: 15px;
       line-height: 1.6;
-      border: 1px solid rgba(255, 255, 255, 0.06);
     }
-    .instructions strong {
-      color: #FFFFFF;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      max-width: 860px;
+      width: 100%;
     }
-    .instructions ol {
-      padding-left: 20px;
-    }
-    .instructions li {
-      margin-bottom: 6px;
-    }
-    .instructions li:last-child {
-      margin-bottom: 0;
-    }
-    .btn-container {
+    .card {
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 26px;
+      padding: 30px 24px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      align-items: center;
+      box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.65);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .card:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+      transform: translateY(-2px);
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #F8FAFC;
+      margin-bottom: 6px;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: #94A3B8;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      min-height: 38px;
+    }
+    .qr-container {
+      background: #FFFFFF;
+      padding: 16px;
+      border-radius: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 22px;
+    }
+    .qr-container img {
+      width: 240px;
+      height: 240px;
+      display: block;
     }
     .btn {
+      width: 100%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 15px 24px;
+      gap: 8px;
+      padding: 14px 20px;
       border-radius: 14px;
       font-size: 15px;
       font-weight: 700;
@@ -123,51 +131,53 @@
       transition: all 0.2s ease;
       cursor: pointer;
     }
-    .btn-download {
+    .btn-green {
       background: linear-gradient(135deg, #10B981 0%, #059669 100%);
       color: #FFFFFF;
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     }
-    .btn-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+    .btn-blue {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: #FFFFFF;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     }
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.08);
-      color: #E2E8F0;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-    .btn-outline:hover {
-      background: rgba(255, 255, 255, 0.15);
+    .btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="badge-ready">
-      <span class="badge-dot"></span> APK Build Ready
+  <div class="header">
+    <div class="badge-live-247">
+      <span class="pulse-dot"></span> 24/7 Permanent Cloud Active
     </div>
-    <h1>Download Android APK</h1>
-    <p class="subtitle">Mobile camera se scan karein ya direct download link par click karein</p>
+    <h1>Owner Management Cloud</h1>
+    <p class="subtitle">Aapki app Render Cloud par permanent live ho chuki hai. Mobile camera se scan karein ya click karein.</p>
+  </div>
 
-    <div class="qr-frame">
-      <img src="./apk-direct-qr.png" alt="Direct APK Download QR Code">
-    </div>
-
-    <div class="instructions">
-      <ol>
-        <li>Mobile phone ka <strong>Camera</strong> ya QR scanner open karein.</li>
-        <li>QR code par point karein — <strong>direct .apk file download</strong> start ho jayegi.</li>
-        <li>Download complete hote hi tap karein aur <strong>Install</strong> karein.</li>
-      </ol>
-    </div>
-
-    <div class="btn-container">
-      <a class="btn btn-download" href="https://expo.dev/artifacts/eas/r60VlmmUBdqRQfGZ3KZxyY2ptOsX9x-fiaQPWgE8AX4.apk" target="_blank" download>
-        ⬇ Direct Download .APK (Click Here)
+  <div class="grid">
+    <!-- Card 1: Permanent Web App -->
+    <div class="card">
+      <div class="card-title">🌐 1. Live Web App (Permanent)</div>
+      <p class="card-desc">Kisi bhi mobile ya computer browser me foran 24/7 chalane ke liye scan karein</p>
+      <div class="qr-container">
+        <img src="./permanent-web-qr.png" alt="Permanent Cloud Web App QR">
+      </div>
+      <a class="btn btn-green" href="https://owner-managemat.onrender.com" target="_blank" rel="noopener noreferrer">
+        Open Permanent Web App ↗
       </a>
-      <a class="btn btn-outline" href="https://expo.dev/accounts/mubeena007s-team/projects/owner-management/builds/8477dea7-d2a2-42f5-bb65-9af650ee2dff" target="_blank" rel="noopener noreferrer">
-        Open Expo Project Build Page ↗
+    </div>
+
+    <!-- Card 2: Permanent APK Build -->
+    <div class="card">
+      <div class="card-title">📱 2. Android APK (Permanent)</div>
+      <p class="card-desc">EAS Cloud Build se permanent 24/7 Android APK download karne ke liye scan karein</p>
+      <div class="qr-container">
+        <img src="./apk-permanent-qr.png" alt="Permanent APK Build QR">
+      </div>
+      <a class="btn btn-blue" href="https://expo.dev/accounts/mubeena007s-team/projects/owner-management/builds/0134c050-97ba-4a58-8933-a5b6917ebfe1" target="_blank" rel="noopener noreferrer">
+        Open APK Build & Download ↗
       </a>
     </div>
   </div>
