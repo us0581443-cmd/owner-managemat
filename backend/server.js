@@ -93,6 +93,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 NEST Backend Server running at http://0.0.0.0:${PORT} (http://127.0.0.1:${PORT})`);
+app.listen(PORT, () => {
+  console.log(`🚀 NEST Backend Server running at http://localhost:${PORT} (http://127.0.0.1:${PORT})`);
 });
